@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=VERSION_HERE
+Name=Subshard
+GenericName=Subshard
+Exec=EXEC_PATH_HERE
+Terminal=false
+Icon=/usr/share/subshard/chromeball_google_chrome_poke_by_azerik92-d4c31vz.png
+Type=Application
+Categories=Application;Network;Security;
+Comment=Subshard - browse through a proxy
