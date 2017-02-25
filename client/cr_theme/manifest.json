@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "version": "1.0.0",
-  "name": "Altnet theme",
+  "name": "Subshard theme",
   "theme": {
     "colors" : {
       "frame" : [160, 10, 31],
