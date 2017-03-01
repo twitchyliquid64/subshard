@@ -3,6 +3,7 @@
 #./make_deb.py <version> [<path-to-config>]
 import packager
 import sys
+sys.path.append('..')
 
 if __name__ == '__main__':
     version = '0.0.1'

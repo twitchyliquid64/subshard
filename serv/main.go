@@ -1,16 +1,33 @@
 package main
 
-import socks5 "github.com/armon/go-socks5"
+import (
+	"log"
+	"net/http"
+
+	"github.com/elazarl/goproxy"
+)
+
+const serverHost = "subshard"
+
+func registerStatic(proxy *goproxy.ProxyHttpServer) {
+	proxy.OnRequest(goproxy.UrlIs(serverHost + "/static/bootstrap.min.css")).DoFunc(func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+		return serveStatic(r, "web/bootstrap.min.css", "text/css")
+	})
+}
+
+func handleSubshardPage(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+	if r.URL.Path == "/" {
+		return serveLandingPage(r)
+	}
+	return r, goproxy.NewResponse(r, "text/html", 404, "Not found")
+}
 
 func main() {
-	conf := &socks5.Config{}
-	server, err := socks5.New(conf)
-	if err != nil {
-		panic(err)
-	}
+	proxy := goproxy.NewProxyHttpServer()
+	proxy.Verbose = true
 
-	// Create SOCKS5 proxy on localhost port 8000
-	if err := server.ListenAndServe("tcp", "127.0.0.1:8000"); err != nil {
-		panic(err)
-	}
+	registerStatic(proxy)
+	proxy.OnRequest(goproxy.UrlHasPrefix(serverHost + "/")).DoFunc(handleSubshardPage)
+
+	log.Fatal(http.ListenAndServe(":8080", proxy))
 }

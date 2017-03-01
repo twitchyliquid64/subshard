@@ -9,12 +9,13 @@ path_to_script_dir = os.path.dirname(os.path.realpath(__file__))
 arch = ''
 config_dir = '/etc/subshard'
 chrome_path = '/opt/google/chrome/chrome'
+proxy_addr = 'localhost:8080'
 theme_dir = os.path.join(path_to_script_dir, 'cr_theme')
-chrome_args = ['--no-first-run', '--disable-default-apps', '--no-default-browser-check']
+chrome_args = ['--no-first-run', '--disable-default-apps', '--no-default-browser-check', 'http://subshard/']
 data_dir = os.path.join(os.path.expanduser("~"), '.subshard_dir')
 
 def load_config(path):
-    global theme_dir, chrome_path, chrome_args, data_dir
+    global theme_dir, chrome_path, chrome_args, data_dir, proxy_addr
     if not os.path.exists(path):
         return False
 
@@ -29,12 +30,15 @@ def load_config(path):
         chrome_args += c['additional_args']
     if 'data_dir' in c:
         data_dir = c['data_dir']
+    if 'proxy_addr' in c:
+        proxy_addr = c['proxy_addr']
     return True
 
 
 def launch():
     args = [chrome_path] + chrome_args + ['--user-data-dir=' + data_dir]
     args.append('--load-extension=' + theme_dir)
+    args.append('--proxy-server=' + proxy_addr)
     print args
     Popen(args, preexec_fn=os.setsid)
 
