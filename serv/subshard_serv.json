@@ -1,0 +1,28 @@
+{
+  "listener": ":8080",
+  "auth-required": true,
+  "verbose": false,
+  "users": [
+    {
+      "username": "test"
+    }
+  ],
+  "blacklist": [
+    {
+      "type": "host",
+      "value": "messenger.com"
+    },
+    {
+      "type": "host",
+      "value": "fb.com"
+    },
+    {
+      "type": "host",
+      "value": "accounts.google.com"
+    },
+    {
+      "type": "host-regexp",
+      "value": ".*facebook\\.com"
+    }
+  ]
+}

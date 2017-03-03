@@ -3,31 +3,23 @@ package main
 import (
 	"log"
 	"net/http"
-
-	"github.com/elazarl/goproxy"
+	"os"
 )
 
 const serverHost = "subshard"
 
-func registerStatic(proxy *goproxy.ProxyHttpServer) {
-	proxy.OnRequest(goproxy.UrlIs(serverHost + "/static/bootstrap.min.css")).DoFunc(func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-		return serveStatic(r, "web/bootstrap.min.css", "text/css")
-	})
-}
-
-func handleSubshardPage(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-	if r.URL.Path == "/" {
-		return serveLandingPage(r)
-	}
-	return r, goproxy.NewResponse(r, "text/html", 404, "Not found")
-}
-
 func main() {
-	proxy := goproxy.NewProxyHttpServer()
-	proxy.Verbose = true
+	configuration, err := readConfig("subshard_serv.json")
+	if err != nil {
+		log.Printf("Error loading configuration (%s): %s\n", "subshard_serv.json", err.Error())
+		os.Exit(1)
+	}
 
-	registerStatic(proxy)
-	proxy.OnRequest(goproxy.UrlHasPrefix(serverHost + "/")).DoFunc(handleSubshardPage)
+	proxy, err := makeProxyServer(configuration)
+	if err != nil {
+		log.Printf("Error initializing server: %s\n", err.Error())
+		os.Exit(2)
+	}
 
-	log.Fatal(http.ListenAndServe(":8080", proxy))
+	log.Fatal(http.ListenAndServe(configuration.Listener, proxy))
 }
