@@ -98,6 +98,7 @@ func makeProxyServer(configuration *Config) (*goproxy.ProxyHttpServer, error) {
 	registerBlacklistHandlers(configuration, proxy)
 
 	registerStatic(proxy)
+	gConfiguration = configuration
 	proxy.OnRequest(goproxy.UrlHasPrefix(serverHost + "/")).DoFunc(handleSubshardPage)
 	return proxy, nil
 }

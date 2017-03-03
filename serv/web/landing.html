@@ -1,3 +1,10 @@
+{{define "BooleanEnabledDisabledRender"}}
+{{if .}}
+<span class="badge badge-success">enabled</span>
+{{else}}
+<span class="badge badge-default">disabled</span>
+{{end}}
+{{end}}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -17,7 +24,65 @@
     <div class="container">
 
       <h1>Subshard</h1>
-      <p class="lead">If you are reading this, subshard is working correctly.</p>
+
+      <div class="row">
+        <p class="lead" style="margin-top:14px;">
+          If you are reading this, subshard is configured correctly.
+        </p>
+      </div>
+      <div class="row" style="margin-top:2em;">
+        <div class="col">
+          <h3>Blackhole rules</h3>
+          <div class="config table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Rule</th>
+                  <th>Match class</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{range .Blacklist}}
+                <tr>
+                  <td>{{.Value}}</td>
+                  <td><span class="badge badge-info">{{.Type}}</td>
+                </tr>
+                {{end}}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="col-4">
+          <h3>Configuration</h3>
+          <div class="config table-responsive">
+            <table class="table">
+              <tbody>
+                <tr>
+                  <td>Listener</td>
+                  <td>{{.Listener}}</td>
+                </tr>
+                <tr>
+                  <td>Auth</td>
+                  <td>
+                    {{if .AuthRequired}}
+                    <span class="badge badge-success">Passwords required</span>
+                    {{else}}
+                    <span class="badge badge-warning">Passwords disabled</span>
+                    {{end}}
+                    <p>
+                      {{len .Users}} user{{if len .Users | ne 1}}s{{end}}
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Debug logging</td>
+                  <td>{{template "BooleanEnabledDisabledRender" .Verbose}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
     </div>
   </body>

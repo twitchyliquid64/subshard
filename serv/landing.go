@@ -4,15 +4,21 @@ import (
 	"bytes"
 	"html/template"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/elazarl/goproxy"
 )
 
+var gConfiguration *Config
+
 func serveLandingPage(r *http.Request) (*http.Request, *http.Response) {
 	buff := bytes.NewBufferString("")
 	t, _ := template.ParseFiles("web/landing.html")
-	t.Execute(buff, nil)
+	err := t.Execute(buff, gConfiguration)
+	if err != nil {
+		log.Println(err)
+	}
 
 	return r, goproxy.NewResponse(r, "text/html", 200, buff.String())
 }
