@@ -62,6 +62,19 @@
                   <td>{{.Listener}}</td>
                 </tr>
                 <tr>
+                  <td>Encryption (TLS)</td>
+                  <td>
+                    {{if .TLS.Enabled}}
+                    <span class="badge badge-success">Enabled</span>
+                    {{else}}
+                    <span class="badge badge-warning">Disabled</span>
+                    <p>
+                      WARNING: traffic goes in the clear!
+                    </p>
+                    {{end}}
+                  </td>
+                </tr>
+                <tr>
                   <td>Auth</td>
                   <td>
                     {{if .AuthRequired}}

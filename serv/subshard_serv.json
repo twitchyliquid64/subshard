@@ -1,6 +1,6 @@
 {
   "listener": ":8080",
-  "auth-required": true,
+  "auth-required": false,
   "verbose": false,
   "users": [
     {
