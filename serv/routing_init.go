@@ -1,7 +1,9 @@
 package main
 
 import (
+	"crypto/sha256"
 	"errors"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -13,7 +15,7 @@ import (
 )
 
 // register URL handlers to handle static files.
-func registerStatic(proxy *goproxy.ProxyHttpServer) {
+func registerStatic(configuration *Config, proxy *goproxy.ProxyHttpServer) {
 	proxy.OnRequest(goproxy.UrlIs(serverHost + "/static/bootstrap.min.css")).DoFunc(func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 		return serveStatic(r, "web/bootstrap.min.css", "text/css")
 	})
@@ -85,8 +87,10 @@ func makeProxyServer(configuration *Config) (*goproxy.ProxyHttpServer, error) {
 	// setup auth
 	if configuration.AuthRequired {
 		auth.ProxyBasic(proxy, "subshard", func(user, passwd string) bool {
+			sha1Hash := fmt.Sprintf("%x", sha256.Sum256([]byte(passwd)))
+
 			for _, usr := range configuration.Users {
-				if usr.Username == user && usr.Password == passwd {
+				if usr.Username == user && usr.Password == sha1Hash {
 					return true
 				}
 			}
@@ -97,7 +101,7 @@ func makeProxyServer(configuration *Config) (*goproxy.ProxyHttpServer, error) {
 	// setup blacklists
 	registerBlacklistHandlers(configuration, proxy)
 
-	registerStatic(proxy)
+	registerStatic(configuration, proxy)
 	gConfiguration = configuration
 	proxy.OnRequest(goproxy.UrlHasPrefix(serverHost + "/")).DoFunc(handleSubshardPage)
 	return proxy, nil

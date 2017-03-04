@@ -1,0 +1,44 @@
+#!/bin/sh
+
+Color_Off='\033[0m'
+Red='\033[0;31m'
+Yellow='\033[0;33m'
+Cyan='\033[0;36m'
+
+
+#Generate self-signed cert if needed
+
+echo ""
+
+if [ -f /etc/subshard/key.pem ]; then
+   echo "${Yellow}Subshard SSL key already exists, the installer will not generate default ones.${Color_Off}"
+   echo "${Yellow}To regenerate your keys, run ${Color_Off}openssl req -x509 -nodes -newkey rsa:4096 -sha256 -keyout /etc/subshard/key.pem -out /etc/subshard/cert.pem -days 365 ${Yellow}in your terminal.${Color_Off}"
+else
+  echo "${Yellow}Generating self-signed certificate. Please enter correct values, for any prompts.${Color_Off}"
+  echo "${Yellow}It is safe to leave all prompts at the default, except for the ${Color_Off}Common Name${Yellow} prompt, for which you should give the DNS address of this server.${Color_Off}"
+  openssl req -x509 -nodes -newkey rsa:4096 -sha256 -keyout /etc/subshard/key.pem -out /etc/subshard/cert.pem -days 365
+
+  echo ""
+  echo "${Yellow} ~====  IMPORTANT  ====~${Color_Off}"
+  echo "Subshard server is installed, however you need to install the auto-generated SSL certifcate on each of your machines."
+  echo "You can find it at ${Cyan}/etc/subshard/cert.pem${Color_Off}."
+  echo ""
+  echo "On your linux clients, install the certificate by running: subshard-install-cert <path-to-certificate>"
+fi
+
+# Generate first user
+
+echo ""
+echo -n "Type in the username of the first user, followed by [ENTER]: "
+read username
+echo -n "Password: "
+stty_orig=`stty -g`
+stty -echo
+read password
+stty $stty_orig
+echo
+
+hashed_pw=$(echo -n "$password" | openssl dgst -sha256 | cut -c 10-)
+
+sed -i -e "s/DEFAULT_USERNAME/${username}/g" /etc/subshard/subshard-serv.json
+sed -i -e "s/DEFAULT_PASSWORD/${hashed_pw}/g" /etc/subshard/subshard-serv.json

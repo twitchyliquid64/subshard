@@ -1,9 +1,9 @@
 #!/usr/bin/python
 #This script should be run from inside the packaging/deb folder.
 #./make_deb.py <version> [<path-to-config>]
-import packager
 import sys
 sys.path.append('..')
+import packager
 
 if __name__ == '__main__':
     version = '0.0.1'
@@ -17,9 +17,11 @@ if __name__ == '__main__':
                                       description='Subshard is an isolated chrome instance that tunnels all its traffic through a proxy.',
                                       desktop_file='subshard.desktop',
                                       desktop_file_path='subshard.desktop',
-                                      bin_files={'../../client/subshard.py': 'subshard'},
+                                      bin_files={'../../client/subshard.py': 'subshard',
+                                                 'subshard-install-cert.sh': 'subshard-install-cert'},
                                       data_files={'../../client/cr_theme': 'cr_theme',
                                                     'chromeball_google_chrome_poke_by_azerik92-d4c31vz.png': 'chromeball_google_chrome_poke_by_azerik92-d4c31vz.png'},
-                                      config_data={'theme_dir': '/usr/share/subshard/cr_theme'})
+                                      config_data={'theme_dir': '/usr/share/subshard/cr_theme'},
+                                      depends=['openssl', 'libnss3-tools'])
 
     print deb_builder.package(version, config_path)

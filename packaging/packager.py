@@ -126,6 +126,10 @@ class DebPackage(Package):
         self.desktop_file_path = kwargs.get('desktop_file_path', self.desktop_file)
         self.config_data = kwargs.get('config_data', {})
 
+        self.architecture = kwargs.get('arch', 'all')
+        self.postinst = kwargs.get('postinst', None)
+        self.depends = kwargs.get('depends', None)
+
     def package(self, version, config_path):
         self.version = version
         if config_path:
@@ -140,12 +144,23 @@ class DebPackage(Package):
         self._make_control_file()
         self._construct_config_file()
 
+        if self.postinst:
+            self._copy_postinst()
+
         return self._build()
+
+    def _copy_postinst(self):
+        postinst_out_path = os.path.join(self.temp_dir, 'DEBIAN', 'postinst')
+        self._log("Apply postinst: %s -> %s", (self.postinst, postinst_out_path), action=True)
+        shutil.copyfile(self.postinst, postinst_out_path)
+        os.chmod(postinst_out_path, stat.S_IWUSR | stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
     def _construct_control_file(self):
         out  = 'Package: %s\n' % self.name
         out += 'Version: %s\n' % self.version
-        out += 'Architecture: all\n'
+        out += 'Architecture: %s\n' % self.architecture
+        if self.depends:
+            out += 'Depends: %s\n' % ','.join(self.depends)
         out += 'Maintainer: %s\n' % self.maintainer
         out += 'Description: %s\n' % self.description
         return out
@@ -178,7 +193,7 @@ class DebPackage(Package):
         conf = self.config_data
         self._log_object(conf)
         with open(os.path.join(self.temp_dir, self.configuration_dir, self.config_file_name), 'w') as outfile:
-            json.dump(conf, outfile)
+            json.dump(conf, outfile, sort_keys=True, indent=4, separators=(',', ': '))
             self._log("\t-> %s", os.path.join(self.temp_dir, self.configuration_dir, self.config_file_name), action=True)
 
     def _build(self):

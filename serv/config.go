@@ -9,11 +9,18 @@ import (
 
 // Config represents the structure of the configuration file.
 type Config struct {
-	Verbose      bool             `json:"verbose"`
-	Listener     string           `json:"listener"`
-	AuthRequired bool             `json:"auth-required"`
-	Users        []User           `json:"users"`
-	Blacklist    []BlacklistEntry `json:"blacklist"`
+	Verbose       bool             `json:"verbose"`
+	Listener      string           `json:"listener"`
+	AuthRequired  bool             `json:"auth-required"`
+	Users         []User           `json:"users"`
+	Blacklist     []BlacklistEntry `json:"blacklist"`
+	ResourcesPath string           `json:"resources-location"`
+
+	TLS struct {
+		CertPemPath string `json:"cert-pem-path"`
+		KeyPemPath  string `json:"key-pem-path"`
+		Enabled     bool   `json:"enabled"`
+	}
 
 	Path string `json:"-"`
 }

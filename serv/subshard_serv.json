@@ -4,7 +4,8 @@
   "verbose": false,
   "users": [
     {
-      "username": "test"
+      "username": "test",
+      "password": "01BA4719C80B6FE911B091A7C05124B64EEECE964E09C058EF8F9805DACA546B"
     }
   ],
   "blacklist": [
