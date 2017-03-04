@@ -113,6 +113,81 @@ class Package(object):
         print CBLUE2 + '\t' + content.replace('\n', '\n\t') + CEND
 
 
+class OSXPackage(Package):
+    plist_xml = '''
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleGetInfoString</key>
+  <string>{bundle_info_string}</string>
+  <key>CFBundleExecutable</key>
+  <string>bin/{executable}</string>
+  <key>CFBundleIdentifier</key>
+  <string>{unique_identifier}</string>
+  <key>CFBundleName</key>
+  <string>{name}</string>
+  <key>CFBundleIconFile</key>
+  <string>{icon}</string>
+  <key>CFBundleShortVersionString</key>
+  <string>{version}</string>
+  <key>CFBundleInfoDictionaryVersion</key>
+  <string>6.0</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+</dict>
+</plist>
+'''
+
+
+    def __init__(self, name, **kwargs):
+        super(OSXPackage, self).__init__(name, os.path.join('/tmp', name + '_osx'), **kwargs)
+        self.configuration_dir = kwargs.get('configuration_dir', '%s.app/Contents/configuration' % name)
+        self.binary_dir = kwargs.get('binary_dir', '%s.app/Contents/MacOS/bin' % name)
+        self.data_dir = kwargs.get('data_dir', '%s.app/Contents/Resources' % name)
+
+        self.bundleInfo = kwargs.get('bundle_info', 'twitchyliquid64 - Copyright (C) 2017')
+        self.executable = kwargs.get('executable', self.bin_files.values()[0])
+        self.unique_identifier = kwargs.get('unique_identifier', 'com.github.twitchyliquid64.' + name)
+        self.icon = kwargs.get('icon', name)
+
+    def package(self, version, config_path):
+        self.version = version
+        if config_path:
+            self.load_config(config_path)
+
+        self._setup_working_dir()
+        self._setup_package_dirs()
+        self._copy_data_and_bin_files()
+
+        self._make_plist_file()
+        return self._build()
+
+    def _construct_plist(self):
+        return OSXPackage.plist_xml.format(
+            version=self.version,
+            name=self.name,
+            bundle_info_string=self.bundleInfo,
+            executable=self.executable,
+            unique_identifier=self.unique_identifier,
+            icon=self.icon,
+        ).strip()
+
+    def _make_plist_file(self):
+        plist = self._construct_plist()
+        plist_path = os.path.join(self.temp_dir, '%s.app'% (self.name), 'Contents')
+        mkdir_p(plist_path)
+        self._log("\nWriting Info.plist file to %s", os.path.join(plist_path, 'Info.plist'), action=True)
+        self._log_block(plist)
+        with open(os.path.join(plist_path, 'Info.plist'), 'w') as outfile:
+            outfile.write(plist)
+
+    def _build(self):
+        dmg_path = os.path.join(self.temp_dir, '%s.dmg'% (self.name))
+        call(['genisoimage', '-V', self.name, '-D', '-R', '-apple', '-no-pad', '-o', dmg_path, self.temp_dir])
+        return dmg_path
+
+
 class DebPackage(Package):
     def __init__(self, name, **kwargs):
         super(DebPackage, self).__init__(name, os.path.join('/tmp', name + '_deb'), **kwargs)
