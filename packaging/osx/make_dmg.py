@@ -1,6 +1,8 @@
 #!/usr/bin/python
 #This script should be run from inside the packaging/osx folder.
 #./make_osx.py <version> [<path-to-config>]
+#
+#Make sure you have the package 'icnsutils' installed.
 import sys
 sys.path.append('..')
 import packager
@@ -17,6 +19,6 @@ if __name__ == '__main__':
                                       bin_files={'../../client/subshard.py': 'subshard'},
                                       data_files={'../../serv/web': 'web',
                                                   '../deb/chromeball_google_chrome_poke_by_azerik92-d4c31vz.png': 'Subshard'},
-                                      icon='/Applications/Subshard.app/Contents/Resources/Subshard')
+                                      icon='../deb/chromeball_google_chrome_poke_by_azerik92-d4c31vz.png')
 
     print osx_builder.package(version, config_path)

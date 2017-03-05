@@ -72,7 +72,10 @@ class Package(object):
               for momo in dirs:
                 os.chmod(os.path.join(root, momo), stat.S_IWUSR | stat.S_IXUSR | stat.S_IRUSR)
               for momo in files:
-                os.chmod(os.path.join(root, momo), stat.S_IWUSR | stat.S_IXUSR | stat.S_IRUSR)
+                try:
+                    os.chmod(os.path.join(root, momo), stat.S_IWUSR | stat.S_IXUSR | stat.S_IRUSR)
+                except Exception, e:
+                    self._log('WARN: Could not chmod() %s: %s', (momo, e))
             shutil.rmtree(self.temp_dir)
         self._log("Creating working dir: %s", self.temp_dir, action=True)
         mkdir_p(self.temp_dir)
@@ -129,7 +132,7 @@ class OSXPackage(Package):
   <string>{name}</string>
   <key>CFBundleIconFile</key>
   <string>{icon}</string>
-  <key>CFBundleShortVersionString</key>
+  <key>CFBundleVersion</key>
   <string>{version}</string>
   <key>CFBundleInfoDictionaryVersion</key>
   <string>6.0</string>
@@ -149,7 +152,7 @@ class OSXPackage(Package):
         self.bundleInfo = kwargs.get('bundle_info', 'twitchyliquid64 - Copyright (C) 2017')
         self.executable = kwargs.get('executable', self.bin_files.values()[0])
         self.unique_identifier = kwargs.get('unique_identifier', 'com.github.twitchyliquid64.' + name)
-        self.icon = kwargs.get('icon', name)
+        self.icon = kwargs.get('icon', name + ".png")
 
     def package(self, version, config_path):
         self.version = version
@@ -161,6 +164,8 @@ class OSXPackage(Package):
         self._copy_data_and_bin_files()
 
         self._make_plist_file()
+        self._make_icon(self.icon)
+        os.symlink('/Applications', os.path.join(self.temp_dir, 'Applications'))
         return self._build()
 
     def _construct_plist(self):
@@ -170,7 +175,7 @@ class OSXPackage(Package):
             bundle_info_string=self.bundleInfo,
             executable=self.executable,
             unique_identifier=self.unique_identifier,
-            icon=self.icon,
+            icon=self.name + '.icns',
         ).strip()
 
     def _make_plist_file(self):
@@ -181,6 +186,9 @@ class OSXPackage(Package):
         self._log_block(plist)
         with open(os.path.join(plist_path, 'Info.plist'), 'w') as outfile:
             outfile.write(plist)
+
+    def _make_icon(self, icon):
+        call(['png2icns', os.path.join(self.temp_dir, self.data_dir, self.name + '.icns'), self.icon])
 
     def _build(self):
         dmg_path = os.path.join(self.temp_dir, '%s.dmg'% (self.name))
