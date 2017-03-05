@@ -6,16 +6,18 @@ from subprocess import Popen
 
 #defaults, populated to platform-specific values in init()
 path_to_script_dir = os.path.dirname(os.path.realpath(__file__))
-arch = ''
 config_dir = '/etc/subshard'
+user_config_dir = os.path.join(os.environ['HOME'], '.config', 'subshard')
 chrome_path = '/opt/google/chrome/chrome'
 proxy_addr = 'https://localhost:8080'
 theme_dir = os.path.join(path_to_script_dir, 'cr_theme')
 chrome_args = ['--no-first-run', '--disable-default-apps', '--no-default-browser-check', 'http://subshard/']
 data_dir = os.path.join(os.path.expanduser("~"), '.subshard_dir')
 
+
+
 def load_config(path):
-    global theme_dir, chrome_path, chrome_args, data_dir, proxy_addr
+    global theme_dir, chrome_path, chrome_args, data_dir, proxy_addr, user_config_dir
     if not os.path.exists(path):
         return False
 
@@ -32,7 +34,10 @@ def load_config(path):
         data_dir = c['data_dir']
     if 'proxy_addr' in c:
         proxy_addr = c['proxy_addr']
+    if 'user_config_dir' in c:
+        user_config_dir = c['user_config_dir']
     return True
+
 
 
 def launch():
@@ -43,14 +48,25 @@ def launch():
     Popen(args, preexec_fn=os.setsid)
 
 
+
 def init():
-    global arch, config_dir
+    global config_dir, chrome_path, theme_dir
     arch = platform.system()
     if arch == 'Linux':
         pass #Defaults as above
+
+    if arch == 'Darwin':
+        chrome_path = r'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+        config_dir = os.path.realpath(os.path.join(path_to_script_dir, '../../configuration'))
+        theme_dir = os.path.realpath(os.path.join(path_to_script_dir, '../../Resources/cr_theme'))
+
     if os.name == 'nt':
         config_dir = os.path.join(os.environ['ProgramFiles'], 'subshard')
+
+    # Load configs if they exist - prefer values for keys in user config over system config.
     load_config(os.path.join(config_dir, 'subshard.json'))
+    load_config(os.path.join(user_config_dir, 'subshard.json'))
+
 
 
 if __name__ == "__main__":

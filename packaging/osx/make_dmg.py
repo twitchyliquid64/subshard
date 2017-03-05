@@ -17,8 +17,7 @@ if __name__ == '__main__':
                                       maintainer='Twitchyliquid64 <twitchyliquid64@ciphersink.net>',
                                       description='Subshard is an isolated chrome instance that tunnels all its traffic through a proxy.',
                                       bin_files={'../../client/subshard.py': 'subshard'},
-                                      data_files={'../../serv/web': 'web',
-                                                  '../deb/chromeball_google_chrome_poke_by_azerik92-d4c31vz.png': 'Subshard'},
+                                      data_files={'../../client/cr_theme': 'cr_theme'},
                                       icon='../deb/chromeball_google_chrome_poke_by_azerik92-d4c31vz.png')
 
     print osx_builder.package(version, config_path)
