@@ -34,6 +34,9 @@ func main() {
 	var wg sync.WaitGroup
 
 	for { //Loop restarts on SIGHUP
+		gTLSConfig = nil
+		gConfiguration = nil
+		gValidBlacklistEntries = nil
 		configuration, err := readConfig(configPathVar)
 		if err != nil {
 			log.Printf("Error loading configuration (%s): %s\n", configPathVar, err.Error())

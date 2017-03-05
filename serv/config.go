@@ -34,8 +34,9 @@ type User struct {
 
 // BlacklistEntry represents the structure of a blacklisted host/regexp
 type BlacklistEntry struct {
-	Type  string `json:"type"`
-	Value string `json:"value"`
+	Type       string `json:"type"`
+	Value      string `json:"value"`
+	ParseError error  `json:"-"`
 }
 
 // ForwardEntry represents the information of another proxy, and the rules which will

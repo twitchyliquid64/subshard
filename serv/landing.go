@@ -15,12 +15,14 @@ import (
 var gConfiguration *Config
 var gTLSConfig *tls.Config
 var gConfigReloads int
+var gValidBlacklistEntries []BlacklistEntry
 
 type landingPageInfo struct {
 	Configuration *Config
 	TLS           *tls.Config
 	TLSInfo       map[string]string
 	ReloadCount   int
+	Blacklist     []BlacklistEntry
 }
 
 func makeLandingPageInfo() *landingPageInfo {
@@ -40,6 +42,7 @@ func makeLandingPageInfo() *landingPageInfo {
 		TLS:           gTLSConfig,
 		TLSInfo:       map[string]string{"Servers": servers},
 		ReloadCount:   gConfigReloads,
+		Blacklist:     gValidBlacklistEntries,
 	}
 }
 

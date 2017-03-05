@@ -83,13 +83,21 @@
                 <tr>
                   <th>Rule</th>
                   <th>Match class</th>
+                  <th style="max-width: 250px;">Status</th>
                 </tr>
               </thead>
               <tbody>
-                {{range .Configuration.Blacklist}}
+                {{range .Blacklist}}
                 <tr>
                   <td>{{.Value}}</td>
-                  <td><span class="badge badge-info">{{.Type}}</td>
+                  <td><span class="badge badge-info">{{.Type}}</span></td>
+                  <td style="max-width: 250px;">
+                    {{if .ParseError}}
+                    <span class="badge badge-danger">Error</span> {{.ParseError.Error}}
+                    {{else}}
+                    <span class="badge badge-success">OK</span>
+                    {{end}}
+                  </td>
                 </tr>
                 {{end}}
               </tbody>

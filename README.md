@@ -11,4 +11,5 @@
  - [ ] Server shell utility script - automate adding users
  - [ ] Server System V service entries
  - [x] Blacklist system
- - [ ] Integration / forward proxy / PEP for other networks/proxies
+ - [x] SOCKS proxy forwarder for specific hosts
+ - [ ] Fix server reload - router state not being cleared?

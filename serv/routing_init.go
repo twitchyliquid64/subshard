@@ -8,7 +8,6 @@ import (
 	"net"
 	"net/http"
 	"regexp"
-	"strings"
 
 	"github.com/elazarl/goproxy"
 	"github.com/elazarl/goproxy/ext/auth"
@@ -21,20 +20,62 @@ func registerStatic(configuration *Config, proxy *goproxy.ProxyHttpServer) {
 	})
 }
 
-func registerBlacklistHandlers(configuration *Config, proxy *goproxy.ProxyHttpServer) {
-	var hostEntries []string
-	var hostRegexps []*regexp.Regexp
+//TODO: Implement, refactor into a rules interface
+type forwardingRule struct {
+	Type string
+}
+
+func makeForwarderHandler(entry ForwardEntry) (forwardinghostMatcher, error) {
+	out := &socksForwarder{Destination: entry.Destination}
+	switch entry.Type {
+	case "SOCKS":
+		for _, rule := range entry.Rules {
+			matcher, err := makeHostBasedBlacklistHandler(rule.Type, rule.Value)
+			if err != nil {
+				log.Printf("Ommitting invalid forwarder rule (%s): %s\n", rule.Value, err)
+			} else {
+				out.MatchRules = append(out.MatchRules, matcher)
+			}
+		}
+	}
+	return out, nil
+}
+
+func makeHostBasedBlacklistHandler(entryType, entryValue string) (hostMatcher, error) {
+	switch entryType {
+	case "host":
+		return &blacklistedhostMatcher{Host: entryValue}, nil
+	case "host-regexp":
+		return makeBlacklistedHostRegexpHandler(entryValue)
+	}
+	return nil, errors.New("Could not handler blacklist type " + entryType)
+}
+
+// Blacklist match handlers + Forwarder handlers
+func registerURLHandlers(configuration *Config, proxy *goproxy.ProxyHttpServer) {
+	var blacklisthostMatchers []hostMatcher
+	var forwardingHandlers []forwardinghostMatcher
+
+	for _, entry := range configuration.Forwarders {
+		handler, err := makeForwarderHandler(entry)
+		if err != nil {
+			log.Println("Forwarder err: ", err)
+		} else {
+			forwardingHandlers = append(forwardingHandlers, handler)
+		}
+	}
+
 	for _, entry := range configuration.Blacklist {
 		switch entry.Type {
 		case "host":
-			hostEntries = append(hostEntries, entry.Value)
 		case "host-regexp":
-			re, err := regexp.Compile(entry.Value)
+			handler, err := makeHostBasedBlacklistHandler(entry.Type, entry.Value)
 			if err != nil {
-				log.Printf("Omitting invalid blacklist regex %s - %s.\n", entry.Value, err.Error())
-				continue
+				log.Printf("Omitting invalid blacklist %s - %s.\n", entry.Value, err.Error())
+				entry.ParseError = err
+			} else {
+				blacklisthostMatchers = append(blacklisthostMatchers, handler)
 			}
-			hostRegexps = append(hostRegexps, re)
 
 		case "prefix":
 			proxy.OnRequest(goproxy.UrlHasPrefix(entry.Value)).DoFunc(handleBlacklistedHost)
@@ -43,28 +84,43 @@ func registerBlacklistHandlers(configuration *Config, proxy *goproxy.ProxyHttpSe
 			re, err := regexp.Compile(entry.Value)
 			if err != nil {
 				log.Printf("Omitting invalid blacklist regex %s - %s.\n", entry.Value, err.Error())
-				continue
+				entry.ParseError = err
+			} else {
+				proxy.OnRequest(goproxy.UrlMatches(re)).DoFunc(handleBlacklistedHost)
 			}
-			proxy.OnRequest(goproxy.UrlMatches(re)).DoFunc(handleBlacklistedHost)
 		}
+		gValidBlacklistEntries = append(gValidBlacklistEntries, entry)
 	}
 
-	// To support HTTPS, block hosts via intercept of dial.
+	// Intercept in the Dial method for host-based blacklist and forward rules
 	proxy.Tr.Dial = func(network, addr string) (c net.Conn, err error) {
-		testHost := strings.Split(addr, ":")[0]
-		for _, host := range hostEntries {
-			if host == testHost {
-				return nil, errors.New("Entry blacklisted: " + host)
+		host, _, err := net.SplitHostPort(addr)
+		if err != nil {
+			return nil, err
+		}
+
+		if blacklisted, msg := isHostBlacklisted(blacklisthostMatchers, host); blacklisted {
+			return nil, errors.New(msg)
+		}
+
+		for _, forwardingHandler := range forwardingHandlers {
+			if forwardingHandler.shouldHandleHost(host) {
+				return forwardingHandler.Dial(network, addr)
 			}
 		}
-		for _, host := range hostRegexps {
-			if host.MatchString(testHost) {
-				return nil, errors.New("Entry blacklisted: " + host.String())
-			}
-		}
+
 		c, err = net.Dial(network, addr)
 		return
 	}
+}
+
+func isHostBlacklisted(blacklisthostMatchers []hostMatcher, host string) (bool, string) {
+	for _, blacklistHandler := range blacklisthostMatchers {
+		if blacklistHandler.shouldHandleHost(host) {
+			return true, "Entry blacklisted: " + host
+		}
+	}
+	return false, ""
 }
 
 // handle a request to subshard/
@@ -98,8 +154,8 @@ func makeProxyServer(configuration *Config) (*goproxy.ProxyHttpServer, error) {
 		})
 	}
 
-	// setup blacklists
-	registerBlacklistHandlers(configuration, proxy)
+	// setup blacklists + forwarders
+	registerURLHandlers(configuration, proxy)
 
 	registerStatic(configuration, proxy)
 	gConfiguration = configuration
