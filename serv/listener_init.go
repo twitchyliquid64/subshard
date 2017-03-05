@@ -45,6 +45,7 @@ func setupListener(configuration *Config) (net.Listener, error) {
 			return nil, err
 		}
 
+		gTLSConfig = tlsConf
 		return listener, nil
 	}
 

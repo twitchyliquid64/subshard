@@ -14,6 +14,7 @@ type Config struct {
 	AuthRequired  bool             `json:"auth-required"`
 	Users         []User           `json:"users"`
 	Blacklist     []BlacklistEntry `json:"blacklist"`
+	Forwarders    []ForwardEntry   `json:"forwarders"`
 	ResourcesPath string           `json:"resources-location"`
 
 	TLS struct {
@@ -35,6 +36,18 @@ type User struct {
 type BlacklistEntry struct {
 	Type  string `json:"type"`
 	Value string `json:"value"`
+}
+
+// ForwardEntry represents the information of another proxy, and the rules which will
+// forward traffic to it.
+type ForwardEntry struct {
+	Name        string `json:"name"`
+	Type        string `json:"type"`
+	Destination string `json:"destination"`
+	Rules       []struct {
+		Type  string `json:"type"`
+		Value string `json:"value"`
+	} `json:"rules"`
 }
 
 func readConfig(fpath string) (*Config, error) {

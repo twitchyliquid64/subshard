@@ -18,6 +18,14 @@
 
     <!-- Bootstrap core CSS -->
     <link href="/static/bootstrap.min.css" rel="stylesheet">
+    <style>
+    .tight-element {
+      display: block;
+    }
+    .tight-element:last-child {
+      display: inline-block;
+    }
+    </style>
   </head>
 
   <body>
@@ -30,8 +38,44 @@
           If you are reading this, subshard is configured correctly.
         </p>
       </div>
+
+
       <div class="row" style="margin-top:2em;">
+
         <div class="col">
+          <h3>Sharding rules</h3>
+          <div class="config table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Rules</th>
+                  <th>Destination</th>
+                  <th>Heath</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{range .Configuration.Forwarders}}
+                <tr>
+                  <td>{{.Name}}</td>
+                  <td>
+                    {{range $index, $element := .Rules}}
+                      <span class="tight-element">{{$element.Value}}
+                        {{if eq .Type `host-regexp`}}<span class="badge badge-primary">Host pattern</span>{{end}}
+                        {{if eq .Type `host`}}<span class="badge badge-primary">Host</span>{{end}}
+                        {{if eq .Type `prefix`}}<span class="badge badge-info">URL prefix</span>{{end}}
+                        {{if eq .Type `regexp`}}<span class="badge badge-info">URL pattern</span>{{end}}
+                      </span>
+                    {{end}}
+                  </td>
+                  <td>{{.Destination}}</td>
+                  <td><span class="badge badge-default">unknown</span></td>
+                </tr>
+                {{end}}
+              </tbody>
+            </table>
+          </div>
+
           <h3>Blackhole rules</h3>
           <div class="config table-responsive">
             <table class="table">
@@ -42,7 +86,7 @@
                 </tr>
               </thead>
               <tbody>
-                {{range .Blacklist}}
+                {{range .Configuration.Blacklist}}
                 <tr>
                   <td>{{.Value}}</td>
                   <td><span class="badge badge-info">{{.Type}}</td>
@@ -59,12 +103,12 @@
               <tbody>
                 <tr>
                   <td>Listener</td>
-                  <td>{{.Listener}}</td>
+                  <td>{{.Configuration.Listener}}</td>
                 </tr>
                 <tr>
-                  <td>Encryption (TLS)</td>
+                  <td>Encryption<br /> (TLS)</td>
                   <td>
-                    {{if .TLS.Enabled}}
+                    {{if .Configuration.TLS.Enabled}}
                     <span class="badge badge-success">Enabled</span>
                     {{else}}
                     <span class="badge badge-warning">Disabled</span>
@@ -72,24 +116,35 @@
                       WARNING: traffic goes in the clear!
                     </p>
                     {{end}}
+                    {{if .TLS}}
+                    <p>
+                      {{len .TLS.Certificates}} certificate{{if len .TLS.Certificates | ne 1}}s{{end}} loaded.
+                      <br />
+                      Servers: <i>{{.TLSInfo.Servers}}</i>
+                    </p>
+                    {{end}}
                   </td>
                 </tr>
                 <tr>
                   <td>Auth</td>
                   <td>
-                    {{if .AuthRequired}}
+                    {{if .Configuration.AuthRequired}}
                     <span class="badge badge-success">Passwords required</span>
                     {{else}}
                     <span class="badge badge-warning">Passwords disabled</span>
                     {{end}}
                     <p>
-                      {{len .Users}} user{{if len .Users | ne 1}}s{{end}}
+                      {{len .Configuration.Users}} user{{if len .Configuration.Users | ne 1}}s{{end}}
                     </p>
                   </td>
                 </tr>
                 <tr>
                   <td>Debug logging</td>
-                  <td>{{template "BooleanEnabledDisabledRender" .Verbose}}</td>
+                  <td>{{template "BooleanEnabledDisabledRender" .Configuration.Verbose}}</td>
+                </tr>
+                <tr>
+                  <td>Reloads</td>
+                  <td>{{.ReloadCount}}</td>
                 </tr>
               </tbody>
             </table>

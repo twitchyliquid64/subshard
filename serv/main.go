@@ -70,6 +70,7 @@ func main() {
 		wg.Wait() //wait for server/listener goroutine to terminate
 		if sig == syscall.SIGHUP {
 			log.Println("Got SIGHUP, reloading")
+			gConfigReloads++
 			continue
 		}
 
