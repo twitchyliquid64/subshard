@@ -6,7 +6,7 @@ import shutil
 import pprint
 import stat
 from subprocess import call
-
+import make_ds_store
 
 CRED      = '\033[91m'
 CITALIC   = '\33[3m'
@@ -166,6 +166,7 @@ class OSXPackage(Package):
         self._make_plist_file()
         self._make_icon(self.icon)
         os.symlink('/Applications', os.path.join(self.temp_dir, 'Applications'))
+        self._make_ds_store()
         return self._build()
 
     def _construct_plist(self):
@@ -187,8 +188,16 @@ class OSXPackage(Package):
         with open(os.path.join(plist_path, 'Info.plist'), 'w') as outfile:
             outfile.write(plist)
 
+    def _make_ds_store(self):
+        self._log("\nCreating DS_Store at:  %s", os.path.join(self.temp_dir, '.DS_Store'), action=True)
+        make_ds_store.Make(os.path.join(self.temp_dir, '.DS_Store'), {'%s.app' % self.name: (175, 90), 'Applications': (475,90)})
+
     def _make_icon(self, icon):
-        call(['png2icns', os.path.join(self.temp_dir, self.data_dir, self.name + '.icns'), self.icon])
+        dest = os.path.join(self.temp_dir, self.data_dir, self.name + '.icns')
+        self._log("\nConverting PNG to ICNS:  %s -> %s", (self.icon, dest), action=True)
+        call(['png2icns', dest, self.icon])
+        self._log("Also setting as the Volume icon.")
+        shutil.copyfile(dest, os.path.join(self.temp_dir, '.VolumeIcon.icns'))
 
     def _build(self):
         dmg_path = os.path.join(self.temp_dir, '%s.dmg'% (self.name))
