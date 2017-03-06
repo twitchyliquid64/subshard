@@ -2,7 +2,8 @@
 import os
 import platform
 import json
-from subprocess import Popen
+import sys
+from subprocess import Popen, call
 
 #defaults, populated to platform-specific values in init()
 path_to_script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -13,11 +14,13 @@ proxy_addr = 'https://localhost:8080'
 theme_dir = os.path.join(path_to_script_dir, 'cr_theme')
 chrome_args = ['--no-first-run', '--disable-default-apps', '--no-default-browser-check', 'http://subshard/']
 data_dir = os.path.join(os.path.expanduser("~"), '.subshard_dir')
-
+terminal_command = 'x-terminal-emulator'
+path_to_configurator = os.path.join(path_to_script_dir, 'subshard_configurator')
 
 
 def load_config(path):
     global theme_dir, chrome_path, chrome_args, data_dir, proxy_addr, user_config_dir
+    global terminal_command, path_to_configurator
     if not os.path.exists(path):
         return False
 
@@ -36,11 +39,20 @@ def load_config(path):
         proxy_addr = c['proxy_addr']
     if 'user_config_dir' in c:
         user_config_dir = c['user_config_dir']
+    if 'terminal_command' in c:
+        terminal_command = c['terminal_command']
+    if 'path_to_configurator' in c:
+        path_to_configurator = c['path_to_configurator']
     return True
 
 
 
 def launch():
+    if not os.path.exists(user_config_dir):
+        print "No user configuration folder: Opening config utility."
+        call([terminal_command, '-e', path_to_configurator], preexec_fn=os.setsid)
+        sys.exit(0)
+
     args = [chrome_path] + chrome_args + ['--user-data-dir=' + data_dir]
     args.append('--load-extension=' + theme_dir)
     args.append('--proxy-server=' + proxy_addr)

@@ -18,6 +18,7 @@ if __name__ == '__main__':
                                       desktop_file='subshard.desktop',
                                       desktop_file_path='subshard.desktop',
                                       bin_files={'../../client/subshard.py': 'subshard',
+                                                 '../../client/subshard_configurator.py': 'subshard_configurator',
                                                  'subshard-install-cert.sh': 'subshard-install-cert'},
                                       data_files={'../../client/cr_theme': 'cr_theme',
                                                     'chromeball_google_chrome_poke_by_azerik92-d4c31vz.png': 'chromeball_google_chrome_poke_by_azerik92-d4c31vz.png'},
