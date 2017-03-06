@@ -3,13 +3,12 @@
 
 ## TODO
 
- - [x] Support HTTPS
- - [x] Deb package for server
- - [x] OSX package for client
- - [ ] Create customized .DS_Store for OSX Dmg package
- - [x] Show TLS common name in landing page
- - [ ] Server shell utility script - automate adding users
+ - [ ] Server shell utility script - automate adding users, automate adding rules
  - [ ] Server System V service entries
+ - [ ] Add autoconfiguration endpoint
+ - [ ] Integration with Tor
+ - [ ] Monitor health of a forwarder
  - [x] Blacklist system
- - [x] SOCKS proxy forwarder for specific hosts
  - [ ] Fix server reload - router state not being cleared?
+
+ - [ ] Use a shell script to make symlinks in /usr/local/bin on OSX
