@@ -14,13 +14,12 @@ proxy_addr = 'https://localhost:8080'
 theme_dir = os.path.join(path_to_script_dir, 'cr_theme')
 chrome_args = ['--no-first-run', '--disable-default-apps', '--no-default-browser-check', 'http://subshard/']
 data_dir = os.path.join(os.path.expanduser("~"), '.subshard_dir')
-terminal_command = 'x-terminal-emulator'
 path_to_configurator = os.path.join(path_to_script_dir, 'subshard_configurator')
-
+arch = ''
 
 def load_config(path):
     global theme_dir, chrome_path, chrome_args, data_dir, proxy_addr, user_config_dir
-    global terminal_command, path_to_configurator
+    global path_to_configurator
     if not os.path.exists(path):
         return False
 
@@ -39,8 +38,6 @@ def load_config(path):
         proxy_addr = c['proxy_addr']
     if 'user_config_dir' in c:
         user_config_dir = c['user_config_dir']
-    if 'terminal_command' in c:
-        terminal_command = c['terminal_command']
     if 'path_to_configurator' in c:
         path_to_configurator = c['path_to_configurator']
     return True
@@ -50,7 +47,10 @@ def load_config(path):
 def launch():
     if not os.path.exists(user_config_dir):
         print "No user configuration folder: Opening config utility."
-        call([terminal_command, '-e', path_to_configurator], preexec_fn=os.setsid)
+        if arch == 'Linux':
+            call(['x-terminal-emulator', '-e', path_to_configurator], preexec_fn=os.setsid)
+        if arch == 'Darwin':
+            call(['/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal', path_to_configurator])
         sys.exit(0)
 
     args = [chrome_path] + chrome_args + ['--user-data-dir=' + data_dir]
@@ -62,7 +62,7 @@ def launch():
 
 
 def init():
-    global config_dir, chrome_path, theme_dir, terminal_command
+    global config_dir, chrome_path, theme_dir, arch
     arch = platform.system()
     if arch == 'Linux':
         pass #Defaults as above
@@ -71,7 +71,6 @@ def init():
         chrome_path = r'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
         config_dir = os.path.realpath(os.path.join(path_to_script_dir, '../../configuration'))
         theme_dir = os.path.realpath(os.path.join(path_to_script_dir, '../../Resources/cr_theme'))
-        terminal_command = 'xterm'
 
     if os.name == 'nt':
         config_dir = os.path.join(os.environ['ProgramFiles'], 'subshard')
