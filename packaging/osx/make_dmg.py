@@ -18,6 +18,7 @@ if __name__ == '__main__':
                                       description='Subshard is an isolated chrome instance that tunnels all its traffic through a proxy.',
                                       bin_files={'../../client/subshard.py': 'subshard',
                                                  '../../client/subshard_configurator.py': 'subshard_configurator'},
+                                      executable='subshard',
                                       data_files={'../../client/cr_theme': 'cr_theme'},
                                       icon='../deb/chromeball_google_chrome_poke_by_azerik92-d4c31vz.png')
 

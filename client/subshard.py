@@ -62,7 +62,7 @@ def launch():
 
 
 def init():
-    global config_dir, chrome_path, theme_dir
+    global config_dir, chrome_path, theme_dir, terminal_command
     arch = platform.system()
     if arch == 'Linux':
         pass #Defaults as above
@@ -71,6 +71,7 @@ def init():
         chrome_path = r'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
         config_dir = os.path.realpath(os.path.join(path_to_script_dir, '../../configuration'))
         theme_dir = os.path.realpath(os.path.join(path_to_script_dir, '../../Resources/cr_theme'))
+        terminal_command = 'xterm'
 
     if os.name == 'nt':
         config_dir = os.path.join(os.environ['ProgramFiles'], 'subshard')
