@@ -46,6 +46,6 @@ if __name__ == '__main__':
                     if value:
                         conf[key] = value
                         with open(user_config_path, 'w') as fp:
-                            json.dump(conf, fp)
+                            json.dump(conf, fp, sort_keys=True, indent=4, separators=(',', ': '))
         except KeyboardInterrupt:
             print ''

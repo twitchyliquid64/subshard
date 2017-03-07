@@ -16,7 +16,8 @@ if __name__ == '__main__':
     deb_builder = packager.DebPackage('subshard-serv',
                                       maintainer='Twitchyliquid64 <twitchyliquid64@ciphersink.net>',
                                       description='Subshard serv is the serverside equivalent to subshard.',
-                                      bin_files={'../../serv/serv': 'subshard-serv'},
+                                      bin_files={'../../serv/serv': 'subshard-serv',
+                                                 'user_admin.py': 'subshard-admin'},
                                       data_files={'../../serv/web': 'web'},
                                       #binary_dir='bin', -- usr/bin is good
                                       configuration_dir='etc/subshard',
