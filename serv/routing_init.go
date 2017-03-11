@@ -116,7 +116,6 @@ func isHostBlacklisted(blacklisthostMatchers []hostMatcher, host string) (bool, 
 			return true, "Entry blacklisted: " + host
 		}
 	}
-	log.Println("ALLOW")
 	return false, ""
 }
 
