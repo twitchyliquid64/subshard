@@ -12,20 +12,23 @@ user_config_dir = os.path.join(os.environ['HOME'], '.config', 'subshard')
 chrome_path = '/opt/google/chrome/chrome'
 proxy_addr = 'https://localhost:8080'
 theme_dir = os.path.join(path_to_script_dir, 'cr_theme')
-chrome_args = ['--no-first-run', '--disable-default-apps', '--no-default-browser-check', 'http://subshard/']
+extension_dir = os.path.join(path_to_script_dir, 'subshard_extension')
+chrome_args = ['--no-first-run', '--disable-default-apps', '--no-default-browser-check', '--no-referrers', '--enforce-webrtc-ip-permission-check', 'http://subshard/']
 data_dir = os.path.join(os.path.expanduser("~"), '.subshard_dir')
 path_to_configurator = os.path.join(path_to_script_dir, 'subshard_configurator')
 arch = ''
 
 def load_config(path):
     global theme_dir, chrome_path, chrome_args, data_dir, proxy_addr, user_config_dir
-    global path_to_configurator
+    global path_to_configurator, extension_dir
     if not os.path.exists(path):
         return False
 
     c = json.load(open(path))
     if 'theme_dir' in c:
         theme_dir = c['theme_dir']
+    if 'extension_dir' in c:
+        extension_dir = c['extension_dir']
     if 'chrome_path' in c:
         chrome_path = c['chrome_path']
     if 'chrome_args' in c: # Override any options except the data dir
@@ -54,7 +57,7 @@ def launch():
         sys.exit(0)
 
     args = [chrome_path] + chrome_args + ['--user-data-dir=' + data_dir]
-    args.append('--load-extension=' + theme_dir)
+    args.append('--load-extension=' + theme_dir + ',' + extension_dir)
     args.append('--proxy-server=' + proxy_addr)
     print args
     Popen(args, preexec_fn=os.setsid)
@@ -62,7 +65,7 @@ def launch():
 
 
 def init():
-    global config_dir, chrome_path, theme_dir, arch
+    global config_dir, chrome_path, theme_dir, arch, extension_dir
     arch = platform.system()
     if arch == 'Linux':
         pass #Defaults as above
@@ -71,6 +74,7 @@ def init():
         chrome_path = r'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
         config_dir = os.path.realpath(os.path.join(path_to_script_dir, '../../configuration'))
         theme_dir = os.path.realpath(os.path.join(path_to_script_dir, '../../Resources/cr_theme'))
+        extension_dir = os.path.realpath(os.path.join(path_to_script_dir, '../../Resources/subshard_extension'))
 
     if os.name == 'nt':
         config_dir = os.path.join(os.environ['ProgramFiles'], 'subshard')

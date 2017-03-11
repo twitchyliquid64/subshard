@@ -20,7 +20,8 @@ if __name__ == '__main__':
                                                  '../../client/subshard_configurator.py': 'subshard_configurator',
                                                  'subshard-install-cert.sh': 'subshard-install-cert'},
                                       executable='subshard',
-                                      data_files={'../../client/cr_theme': 'cr_theme'},
+                                      data_files={'../../client/cr_theme': 'cr_theme',
+                                                  '../../client/subshard_extension': 'subshard_extension'},
                                       icon='../deb/chromeball_google_chrome_poke_by_azerik92-d4c31vz.png')
 
     print osx_builder.package(version, config_path)

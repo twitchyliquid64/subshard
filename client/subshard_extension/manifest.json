@@ -1,0 +1,31 @@
+{
+  "name": "Subshard guard",
+  "version": "0.0.1",
+  "manifest_version": 2,
+  "description": "This extension helps guard against information leakage across dark/clear nets, and protect you from insecure configurations.",
+  "homepage_url": "https://github.com/twitchyliquid64/subshard",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "default_locale": "en",
+  "background": {
+    "page": "src/bg/background.html",
+    "persistent": true
+  },
+  "options_page": "src/options_custom/index.html",
+  "browser_action": {
+    "default_icon": "icons/chromeball_google_chrome_poke_by_azerik92-d4c31vz.png",
+    "default_title": "Subshard Guard",
+    "default_popup": "src/page_action/page_action.html"
+  },
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "tabs",
+    "storage",
+    "https://*/*",
+    "http://*/*"
+  ]
+}

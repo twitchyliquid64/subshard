@@ -21,8 +21,10 @@ if __name__ == '__main__':
                                                  '../../client/subshard_configurator.py': 'subshard_configurator',
                                                  'subshard-install-cert.sh': 'subshard-install-cert'},
                                       data_files={'../../client/cr_theme': 'cr_theme',
-                                                    'chromeball_google_chrome_poke_by_azerik92-d4c31vz.png': 'chromeball_google_chrome_poke_by_azerik92-d4c31vz.png'},
-                                      config_data={'theme_dir': '/usr/share/subshard/cr_theme'},
+                                                  '../../client/subshard_extension': 'subshard_extension',
+                                                  'chromeball_google_chrome_poke_by_azerik92-d4c31vz.png': 'chromeball_google_chrome_poke_by_azerik92-d4c31vz.png'},
+                                      config_data={'theme_dir': '/usr/share/subshard/cr_theme',
+                                                   'extension_dir': '/usr/share/subshard/subshard_extension'},
                                       depends=['openssl', 'libnss3-tools'])
 
     print deb_builder.package(version, config_path)
