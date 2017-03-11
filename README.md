@@ -10,6 +10,5 @@
  - [ ] Integration with Tor
  - [ ] Monitor health of a forwarder
  - [x] Blacklist system
- - [ ] Fix server reload - router state not being cleared?
 
  - [ ] Use a shell script to make symlinks in /usr/local/bin on OSX

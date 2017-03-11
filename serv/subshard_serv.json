@@ -1,29 +1,33 @@
 {
-  "listener": ":8080",
-  "auth-required": false,
-  "verbose": false,
-  "users": [
-    {
-      "username": "test",
-      "password": "01BA4719C80B6FE911B091A7C05124B64EEECE964E09C058EF8F9805DACA546B"
-    }
-  ],
-  "blacklist": [
-    {
-      "type": "host",
-      "value": "messenger.com"
-    },
-    {
-      "type": "host",
-      "value": "fb.com"
-    },
-    {
-      "type": "host",
-      "value": "accounts.google.com"
-    },
-    {
-      "type": "host-regexp",
-      "value": ".*facebook\\.com"
-    }
-  ]
+    "auth-required": false,
+    "blacklist": [
+        {
+            "type": "host",
+            "value": "messenger.com"
+        },
+        {
+            "type": "host",
+            "value": "accounts.google.com"
+        },
+        {
+            "type": "host",
+            "value": "facebook.com"
+        },
+        {
+            "type": "host-regexp",
+            "value": ".*facebook.com"
+        },
+        {
+            "type": "host-regexp",
+            "value": ".*fb.com"
+        }
+    ],
+    "listener": ":8080",
+    "users": [
+        {
+            "password": "01BA4719C80B6FE911B091A7C05124B64EEECE964E09C058EF8F9805DACA546B",
+            "username": "test"
+        }
+    ],
+    "verbose": true
 }

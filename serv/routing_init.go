@@ -20,11 +20,6 @@ func registerStatic(configuration *Config, proxy *goproxy.ProxyHttpServer) {
 	})
 }
 
-//TODO: Implement, refactor into a rules interface
-type forwardingRule struct {
-	Type string
-}
-
 func makeForwarderHandler(entry ForwardEntry) (forwardinghostMatcher, error) {
 	out := &socksForwarder{Destination: entry.Destination}
 	switch entry.Type {
@@ -112,6 +107,7 @@ func registerURLHandlers(configuration *Config, proxy *goproxy.ProxyHttpServer) 
 		c, err = net.Dial(network, addr)
 		return
 	}
+	proxy.ConnectDial = proxy.Tr.Dial
 }
 
 func isHostBlacklisted(blacklisthostMatchers []hostMatcher, host string) (bool, string) {
@@ -120,6 +116,7 @@ func isHostBlacklisted(blacklisthostMatchers []hostMatcher, host string) (bool, 
 			return true, "Entry blacklisted: " + host
 		}
 	}
+	log.Println("ALLOW")
 	return false, ""
 }
 

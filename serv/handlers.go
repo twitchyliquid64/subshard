@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net"
 	"regexp"
 
@@ -9,6 +10,7 @@ import (
 
 type hostMatcher interface {
 	shouldHandleHost(host string) bool
+	String() string
 }
 
 type forwardinghostMatcher interface {
@@ -40,6 +42,10 @@ func (f *socksForwarder) Dial(network, addr string) (net.Conn, error) {
 	return sc.Dial(network, addr)
 }
 
+func (f *socksForwarder) String() string {
+	return "socksForwarder{" + f.Destination + ", Rules: " + fmt.Sprint(f.MatchRules) + "}"
+}
+
 type blacklistedhostMatcher struct {
 	Host string
 }
@@ -51,9 +57,17 @@ func (b *blacklistedhostMatcher) shouldHandleHost(host string) bool {
 	return false
 }
 
+func (b *blacklistedhostMatcher) String() string {
+	return "hostMatcher{" + b.Host + "}"
+}
+
 type blacklistedRegexhostMatcher struct {
 	HostRegex string
 	Regex     *regexp.Regexp
+}
+
+func (b *blacklistedRegexhostMatcher) String() string {
+	return "hostRegexMatcher{" + b.HostRegex + ", " + b.Regex.String() + "}"
 }
 
 func (b *blacklistedRegexhostMatcher) shouldHandleHost(host string) bool {

@@ -52,7 +52,7 @@ def help():
 def parseArgs():
     global config_path
     try:
-        opts, args = getopt.getopt(sys.argv,"ch",["config="])
+        opts, args = getopt.getopt(sys.argv[1:],"h",["config="])
         for opt, arg in opts:
             if opt in ("-c", "--config"):
                 config_path = arg
@@ -135,7 +135,7 @@ def unblacklist(data, args):
     args = sanitizeBlacklistArgs(args)
     entries = data.get('blacklist', [])
     initial_size = len(entries)
-    entries = filter(lambda x: x['type'] != args[0] and x['value'] != args[1], entries)
+    entries = filter(lambda x: x['type'] != args[0] or x['value'] != args[1], entries)
     data['blacklist'] = entries
     if len(entries) == initial_size:
         print 'Err: Entry does not exist.'
@@ -166,7 +166,7 @@ def show(data, args):
 
 
 if __name__ == '__main__':
-    args = parseArgs()[1:]
+    args = parseArgs()
     checkArgs(args)
 
     data = json.load(open(config_path, 'r'))
