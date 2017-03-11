@@ -4,8 +4,8 @@
 ## TODO
 
  - [x] Server shell utility script - automate adding users
- - [ ] Server shell utility script - automate adding rules
- - [ ] Server System V service entries
+ - [x] Server shell utility script - automate adding rules
+ - [x] Server System V service entries
  - [ ] Add autoconfiguration endpoint
  - [ ] Integration with Tor
  - [ ] Monitor health of a forwarder

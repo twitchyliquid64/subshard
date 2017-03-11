@@ -221,6 +221,7 @@ class DebPackage(Package):
         self.architecture = kwargs.get('arch', 'all')
         self.postinst = kwargs.get('postinst', None)
         self.depends = kwargs.get('depends', None)
+        self.sysv_script = kwargs.get('sysv_script', None)
 
     def package(self, version, config_path):
         self.version = version
@@ -239,7 +240,17 @@ class DebPackage(Package):
         if self.postinst:
             self._copy_postinst()
 
+        if self.sysv_script:
+            self._copy_sysv_script()
+
         return self._build()
+
+    def _copy_sysv_script(self):
+        mkdir_p(os.path.join(self.temp_dir, 'etc/init.d'))
+        sysv_script_out_path = os.path.join(self.temp_dir, 'etc', 'init.d', self.name)
+        self._log("Apply service script: %s -> %s", (self.sysv_script, sysv_script_out_path), action=True)
+        shutil.copyfile(self.sysv_script, sysv_script_out_path)
+        os.chmod(sysv_script_out_path, stat.S_IWUSR | stat.S_IRUSR | stat.S_IRGRP| stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
 
     def _copy_postinst(self):
         postinst_out_path = os.path.join(self.temp_dir, 'DEBIAN', 'postinst')
