@@ -3,22 +3,15 @@
 # description: Subshard server
 #
 
-# Get function from functions library
-. /etc/init.d/functions
-
 # Start the service subshard-serv
 start() {
         /usr/bin/subshard-serv &
-        ### Create the lock file ###
-        touch /var/lock/subsys/subshard-serv
         echo
 }
 
 # Restart the service FOO
 stop() {
         killall -2 subshard-serv
-        ### Now, delete the lock file ###
-        rm -f /var/lock/subsys/subshard-serv
         echo
 }
 
