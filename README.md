@@ -3,6 +3,13 @@
 Subshard is a well packaged, secure-by-default web proxy. Deploy the server component on a remote box/VPS/EC2. Install the client component on your computer. Browse the web by
 proxy, even setup forwarders on the server to allow you to browse darknets without messy config on your client.
 
+Benefits:
+
+ * Separate browser keeps your cookies and local storage separate to stop information leakage from your regular browsing.
+ * Bright red color theme is a visual indication of browser separation
+ * Serverside domain blacklists can help to prevent accidental browsing or leakage to ad-domains.
+ * Ability to seamlessly forward certain URLs to other SOCKS proxies means you can browse darknets from within the browser. A builtin extension `subshard guard` will prevent cross domain leakage (via web request) on sensitive domains.
+
 ## Installation
 
 ### Server
