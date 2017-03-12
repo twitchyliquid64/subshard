@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#This script should be run from inside the packaging/deb folder.
+#This script should be run from inside the packaging/server_deb folder.
 #./make_deb.py <version> <arch> [<path-to-config>]
 import sys
 sys.path.append('..')

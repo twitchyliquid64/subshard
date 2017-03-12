@@ -2,7 +2,7 @@
 #This script should be run from inside the packaging/osx folder.
 #./make_osx.py <version> [<path-to-config>]
 #
-#Make sure you have the package 'icnsutils' installed.
+#Make sure you have the package 'icnsutils' and 'genisoimage' installed.
 import sys
 sys.path.append('..')
 import packager
