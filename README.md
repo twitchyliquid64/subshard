@@ -71,6 +71,10 @@ ource by running the packaging script in packaging/osx, or downloading a prebuil
 
 You need to install the servers certificate into the trust root of your computer, because otherwise Chrome won't trust your server. This can be done by invoking `subshard-install-cert <certificate-file>` from the command line.
 
+##### Chrome error: ERR_PROXY_CONNECTION_FAILED
+
+Your server is not running, is not accessible, or the server address is incorrect. Confirm the server is running, and check the server address as per instructions below.
+
 ##### I need to change the server address
 
 1. Invoke `subshard_configurator` from the command line.
