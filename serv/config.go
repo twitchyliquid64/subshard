@@ -16,6 +16,7 @@ type Config struct {
 	Blacklist     []BlacklistEntry `json:"blacklist"`
 	Forwarders    []ForwardEntry   `json:"forwarders"`
 	ResourcesPath string           `json:"resources-location"`
+	Version       string           `json:"version"`
 
 	TLS struct {
 		CertPemPath string `json:"cert-pem-path"`
