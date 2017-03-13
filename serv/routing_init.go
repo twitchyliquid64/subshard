@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"regexp"
+	"strings"
 
 	"github.com/elazarl/goproxy"
 	"github.com/elazarl/goproxy/ext/auth"
@@ -124,7 +125,16 @@ func handleSubshardPage(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, 
 	if r.URL.Path == "/" {
 		return serveLandingPage(r)
 	}
+	if strings.HasPrefix(r.URL.Path, "/test") {
+		return serveTestPage(r)
+	}
+
 	return r, goproxy.NewResponse(r, "text/html", 404, "Not found")
+}
+
+//handle a request to subshard.onion or subshard/test
+func serveOnionPage(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+	return serveTestPage(r)
 }
 
 // handle a request to a host which is in configuration.BlasklistedHosts
@@ -156,5 +166,6 @@ func makeProxyServer(configuration *Config) (*goproxy.ProxyHttpServer, error) {
 	registerStatic(configuration, proxy)
 	gConfiguration = configuration
 	proxy.OnRequest(goproxy.UrlHasPrefix(serverHost + "/")).DoFunc(handleSubshardPage)
+	proxy.OnRequest(goproxy.UrlHasPrefix("subshard.onion/")).DoFunc(serveOnionPage)
 	return proxy, nil
 }

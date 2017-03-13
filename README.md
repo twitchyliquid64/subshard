@@ -88,6 +88,6 @@ Your server is not running, is not accessible, or the server address is incorrec
 
  - [ ] Monitor health of a forwarder
  - [ ] Document how to setup a Tor forwarder
- - [ ] Verification endpoint for Subshard Guard.
+ - [x] Verification endpoint for Subshard Guard.
  - [ ] Make options page for Subshard Guard work.
  - [ ] Use a shell script to make symlinks in /usr/local/bin on OSX

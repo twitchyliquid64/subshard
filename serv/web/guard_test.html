@@ -1,0 +1,23 @@
+<html>
+  <body>
+
+    <div align="center">
+      {{if eq .REQ.URL.Path "/"}}
+      <h2>Subshard Guard Test</h2>
+      <img src="https://www.google.com.au/images/branding/googlelogo/2x/googlelogo_color_120x44dp.png" alt="Google" height="44" width="120">
+      <p>
+        If you can see the image above, Subshard Guard (chrome extension) is not functioning correctly, unless it was served from the cache. Shift-F5 to force a load without caching to check.
+      </p>
+      {{else}}
+      <h2>Information from your browser:</h2>
+      <div align="left">
+        <p>
+          <b>Request</b>
+        </p>
+        <pre>{{.DUMP}}</pre>
+      </div>
+      {{end}}
+    </div>
+
+  </body>
+</html>

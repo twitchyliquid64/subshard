@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"path"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/elazarl/goproxy"
 )
 
@@ -60,6 +61,28 @@ func serveLandingPage(r *http.Request) (*http.Request, *http.Response) {
 		return r, goproxy.NewResponse(r, "text/html", 500, "Internal server error")
 	}
 	err = t.Execute(buff, makeLandingPageInfo())
+	if err != nil {
+		log.Println(err)
+		return r, goproxy.NewResponse(r, "text/html", 500, "Internal server error")
+	}
+
+	return r, goproxy.NewResponse(r, "text/html", 500, buff.String())
+}
+
+func serveTestPage(r *http.Request) (*http.Request, *http.Response) {
+	guardPagePath := "web/guard_test.html"
+	if gConfiguration.ResourcesPath != "" {
+		guardPagePath = path.Join(gConfiguration.ResourcesPath, "web/guard_test.html")
+	}
+
+	buff := bytes.NewBufferString("")
+	buff.Grow(4096) //pre-allocate
+	t, err := template.ParseFiles(guardPagePath)
+	if err != nil {
+		log.Println(err)
+		return r, goproxy.NewResponse(r, "text/html", 500, "Internal server error")
+	}
+	err = t.Execute(buff, map[string]interface{}{"REQ": r, "DUMP": spew.Sdump(r)})
 	if err != nil {
 		log.Println(err)
 		return r, goproxy.NewResponse(r, "text/html", 500, "Internal server error")
