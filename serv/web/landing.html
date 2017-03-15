@@ -41,13 +41,9 @@
           <a href="http://subshard.onion/" class="btn btn-outline-warning" role="button" aria-disabled="true">Test Subshard Guard</a>
           <a href="/test" class="btn btn-outline-info" role="button" aria-disabled="true">See request info</a>
         </div>
-      </div>
 
-
-      <div class="row" style="margin-top:2em;">
-
-        <div class="col">
-          <h3>Sharding rules</h3>
+        <div class="col" style="margin-top:2em;">
+          <h3 >Sharding rules</h3>
           <div class="config table-responsive">
             <table class="table">
               <thead>
@@ -73,13 +69,43 @@
                     {{end}}
                   </td>
                   <td>{{.Destination}}</td>
-                  <td><span class="badge badge-default">unknown</span></td>
+                  <td style="max-width: 170px;">
+                    {{if .Checker.Type}}
+                    {{with $x := .Checker.GetOutput}}
+                      {{if $x.Ok}}
+                        <span class="badge badge-success">OK</span>
+                        <span>{{$x.Info.Version}}</span>
+                        <br />
+                        {{if $x.Info.isDormant}}
+                        <span class="badge badge-success">Dormant</span>
+                        {{end}}
+                        {{if $x.Info.circuitsEstablished}}
+                        <span class="badge badge-info">Has circuits</span>
+                        {{end}}
+                        {{if $x.Info.enoughDirInfo}}
+                        <span class="badge badge-info">Directory bootstrapped</span>
+                        {{end}}
+                      {{else}}
+                        <span class="badge badge-danger">ERR</span>
+                        <span>{{$x.Err}}</span>
+                      {{end}}
+                    {{end}}
+                    {{else}}
+                      <span class="badge badge-default">unknown</span>
+                    {{end}}
+                  </td>
                 </tr>
                 {{end}}
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
 
+
+      <div class="row">
+
+        <div class="col">
           <h3>Blackhole rules</h3>
           <div class="config table-responsive">
             <table class="table">

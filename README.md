@@ -86,7 +86,7 @@ Your server is not running, is not accessible, or the server address is incorrec
 
 ### TODO
 
- - [ ] Monitor health of a forwarder
+ - [x] Monitor health of a forwarder
  - [ ] Document how to setup a Tor forwarder
  - [x] Verification endpoint for Subshard Guard.
  - [ ] Make options page for Subshard Guard work.

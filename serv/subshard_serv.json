@@ -29,5 +29,15 @@
             "username": "test"
         }
     ],
-    "verbose": true
+    "verbose": true,
+    "forwarders": [
+        {
+		"name": "Yolo",
+		"checker": {
+			"type": "TOR",
+			"destination": "localhost:9051",
+			"auth": "testpass"
+		}
+        }
+    ]
 }

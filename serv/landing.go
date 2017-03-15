@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"crypto/tls"
+	"errors"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -98,4 +99,51 @@ func serveStatic(r *http.Request, fname, contentType string) (*http.Request, *ht
 	d, _ := ioutil.ReadFile(fname)
 
 	return r, goproxy.NewResponse(r, contentType, 200, string(d))
+}
+
+type forwarderCheckOutput struct {
+	Ok   bool
+	Err  error
+	Info map[string]interface{}
+}
+
+// GetOutput returns a structure describing the operational state of the forwarder.
+func (f *ForwarderChecker) GetOutput() forwarderCheckOutput {
+	switch f.Type {
+	case "TOR":
+		t := TorControl{}
+		err := t.Dial("tcp", f.Destination)
+		if err != nil {
+			return forwarderCheckOutput{false, err, nil}
+		}
+		defer t.Close()
+		if f.Auth != "" {
+			err = t.PasswordAuthenticate(f.Auth)
+			if err != nil {
+				return forwarderCheckOutput{false, err, nil}
+			}
+		}
+		version, err := t.TorVersion()
+		if err != nil {
+			return forwarderCheckOutput{false, err, nil}
+		}
+		isDormant, _ := t.IsDormant()
+		circuitsEstablished, _ := t.CircuitsEstablished()
+		enoughDirInfo, _ := t.EnoughDirInfo()
+		socksLocal, _ := t.SocksListenersAreLocal()
+		controlLocal, _ := t.ControlListenersAreLocal()
+		return forwarderCheckOutput{
+			socksLocal && controlLocal,
+			nil,
+			map[string]interface{}{
+				"version":             version,
+				"isDormant":           isDormant,
+				"circuitsEstablished": circuitsEstablished,
+				"enoughDirInfo":       enoughDirInfo,
+				"socksLocal":          socksLocal,
+				"controlLocal":        controlLocal,
+			},
+		}
+	}
+	return forwarderCheckOutput{false, errors.New("Cannot handle ForwarderChecker: " + f.Type), nil}
 }

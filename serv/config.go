@@ -50,6 +50,14 @@ type ForwardEntry struct {
 		Type  string `json:"type"`
 		Value string `json:"value"`
 	} `json:"rules"`
+	Checker ForwarderChecker `json:"checker"`
+}
+
+// ForwarderChecker represents rules used to check the health of a forwarder.
+type ForwarderChecker struct {
+	Type        string `json:"type"`
+	Destination string `json:"destination"`
+	Auth        string `json:"auth"`
 }
 
 func readConfig(fpath string) (*Config, error) {
