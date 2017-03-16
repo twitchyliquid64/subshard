@@ -19,6 +19,9 @@ func registerStatic(configuration *Config, proxy *goproxy.ProxyHttpServer) {
 	proxy.OnRequest(goproxy.UrlIs(serverHost + "/static/bootstrap.min.css")).DoFunc(func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 		return serveStatic(r, "web/bootstrap.min.css", "text/css")
 	})
+	proxy.OnRequest(goproxy.UrlIs(serverHost + "/static/jquery.min.js")).DoFunc(func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+		return serveStatic(r, "web/jquery.min.js", "application/javascript")
+	})
 }
 
 func makeForwarderHandler(entry ForwardEntry) (forwardinghostMatcher, error) {
@@ -140,6 +143,10 @@ func handleSubshardPage(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, 
 	}
 	if strings.HasPrefix(r.URL.Path, "/test") {
 		return serveTestPage(r)
+	}
+
+	if strings.HasPrefix(r.URL.Path, "/forwarder/status/") {
+		return serveForwarderStatus(r)
 	}
 
 	return r, goproxy.NewResponse(r, "text/html", 404, "Not found")

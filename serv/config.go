@@ -59,6 +59,7 @@ type ForwarderChecker struct {
 	Type        string `json:"type"`
 	Destination string `json:"destination"`
 	Auth        string `json:"auth"`
+	ConnTimeout int    `json:"conn-timeout"`
 }
 
 func readConfig(fpath string) (*Config, error) {

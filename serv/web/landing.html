@@ -26,6 +26,7 @@
       display: inline-block;
     }
     </style>
+    <script type="text/javascript" src="/static/jquery.min.js"></script>
   </head>
 
   <body>
@@ -63,33 +64,15 @@
                       <span class="tight-element">{{$element.Value}}
                         {{if eq .Type `host-regexp`}}<span class="badge badge-primary">Host pattern</span>{{end}}
                         {{if eq .Type `host`}}<span class="badge badge-primary">Host</span>{{end}}
-                        {{if eq .Type `prefix`}}<span class="badge badge-info">URL prefix</span>{{end}}
-                        {{if eq .Type `regexp`}}<span class="badge badge-info">URL pattern</span>{{end}}
+                        {{if eq .Type `prefix`}}<span class="badge badge-primary">URL prefix</span>{{end}}
+                        {{if eq .Type `regexp`}}<span class="badge badge-primary">URL pattern</span>{{end}}
                       </span>
                     {{end}}
                   </td>
                   <td>{{.Destination}}</td>
-                  <td style="max-width: 170px;">
+                  <td style="width: 240px; height: 78px;">
                     {{if .Checker.Type}}
-                    {{with $x := .Checker.GetOutput}}
-                      {{if $x.Ok}}
-                        <span class="badge badge-success">OK</span>
-                        <span>{{$x.Info.version}}</span>
-                        <br />
-                        {{if $x.Info.isDormant}}
-                        <span class="badge badge-success">Dormant</span>
-                        {{end}}
-                        {{if $x.Info.circuitsEstablished}}
-                        <span class="badge badge-info">Has circuits</span>
-                        {{end}}
-                        {{if $x.Info.enoughDirInfo}}
-                        <span class="badge badge-info">Directory bootstrapped</span>
-                        {{end}}
-                      {{else}}
-                        <span class="badge badge-danger">ERR</span>
-                        <span>{{$x.Err}}</span>
-                      {{end}}
-                    {{end}}
+                      <span class="checker-region" id="{{.Name}}-checker">...</span><br />
                     {{else}}
                       <span class="badge badge-default">unknown</span>
                     {{end}}
@@ -121,7 +104,7 @@
                 <tr>
                   <td>{{.Value}}</td>
                   <td><span class="badge badge-info">{{.Type}}</span></td>
-                  <td style="max-width: 250px;">
+                  <td style="min-width: 210px;">
                     {{if .ParseError}}
                     <span class="badge badge-danger">Error</span> {{.ParseError.Error}}
                     {{else}}
@@ -195,5 +178,45 @@
       </div>
 
     </div>
+
+    <script>
+      $(document).ready(function(){
+        //console.log($(".checker-region"));
+        $(".checker-region").each(function(index){
+          var name = $(this).attr('id').slice(0, -8);
+          //console.log(name);
+          $.ajax({
+            url: "/forwarder/status/" + name,
+            context: this,
+          }).done(function(data) {
+            console.log(data);
+            if (data.Ok) {
+              var out = '<span class="badge badge-success">OK</span> ';
+              if (data.Info.version){
+                out += data.Info.version.split(' ')[0];
+              }
+              out += '<br/>';
+              if (data.Info.latency){
+                out += '<span class="badge badge-info">latency=' + data.Info.latency + 'ms</span> ';
+              }
+              if (data.Info.isDormant){
+                out += '<span class="badge badge-success">Dormant</span> ';
+              }
+              if (data.Info.circuitsEstablished){
+                out += '<span class="badge badge-info">Has circuits</span> ';
+              }
+              if (data.Info.enoughDirInfo){
+                out += '<span class="badge badge-info">Directory bootstrapped</span> ';
+              }
+              $( this ).html( out );
+            } else {
+              var out = '<span class="badge badge-danger">ERR</span>';
+              out += '<span>' + data.Err2 + '</span>';
+              $( this ).html( out );
+            }
+          });
+        });
+      });
+    </script>
   </body>
 </html>

@@ -35,6 +35,11 @@
 		"name": "Yolo",
 		"type": "HTTPS",
 		"destination": "spartic:443",
+		"checker": {
+			"type": "HTTPS",
+			"destination": "https://spartic/",
+			"conn-timeout": 2000
+		},
 		"rules": [
 		{
 			"type": "prefix",
@@ -45,7 +50,7 @@
         {
 		"name": "Yolo2",
 		"type": "HTTP",
-		"destination": "dicapt:80",
+		"destination": "dicapt1:80",
 		"host": "dicapt",
 		"rules": [
 		{

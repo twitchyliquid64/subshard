@@ -31,6 +31,7 @@ import (
 	"net/textproto"
 	"path"
 	"strings"
+	"time"
 )
 
 const (
@@ -62,10 +63,10 @@ func (t *TorControl) Close() error {
 	return t.controlConn.Close()
 }
 
-// Dial handles unix domain sockets and tcp!
-func (t *TorControl) Dial(network, addr string) error {
+// DialTimeout handles unix domain sockets and tcp!
+func (t *TorControl) DialTimeout(network, addr string, timeoutMillis int) error {
 	var err error = nil
-	t.controlConn, err = net.Dial(network, addr)
+	t.controlConn, err = net.DialTimeout(network, addr, time.Duration(timeoutMillis)*time.Millisecond)
 	if err != nil {
 		return err
 	}
