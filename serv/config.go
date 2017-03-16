@@ -43,10 +43,11 @@ type BlacklistEntry struct {
 // ForwardEntry represents the information of another proxy, and the rules which will
 // forward traffic to it.
 type ForwardEntry struct {
-	Name        string `json:"name"`
-	Type        string `json:"type"`
-	Destination string `json:"destination"`
-	Rules       []struct {
+	Name                    string `json:"name"`
+	Type                    string `json:"type"`
+	Destination             string `json:"destination"`
+	HostFieldForHTTPProxies string `json:"host"`
+	Rules                   []struct {
 		Type  string `json:"type"`
 		Value string `json:"value"`
 	} `json:"rules"`

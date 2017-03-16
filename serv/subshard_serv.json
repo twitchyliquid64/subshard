@@ -33,11 +33,26 @@
     "forwarders": [
         {
 		"name": "Yolo",
-		"checker": {
-			"type": "TOR",
-			"destination": "localhost:9051",
-			"auth": "testpass"
+		"type": "HTTPS",
+		"destination": "spartic:443",
+		"rules": [
+		{
+			"type": "prefix",
+			"value": "hanoi"
 		}
+		]
+        },
+        {
+		"name": "Yolo2",
+		"type": "HTTP",
+		"destination": "dicapt:80",
+		"host": "dicapt",
+		"rules": [
+		{
+			"type": "prefix",
+			"value": "dicapt.local"
+		}
+		]
         }
     ]
 }

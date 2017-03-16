@@ -1,10 +1,13 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net"
+	"net/http"
 	"regexp"
 
+	"github.com/elazarl/goproxy"
 	socks "github.com/fangdingjun/socks-go"
 )
 
@@ -16,6 +19,34 @@ type hostMatcher interface {
 type forwardinghostMatcher interface {
 	hostMatcher
 	Dial(network, addr string) (net.Conn, error)
+}
+
+type httpForwarder struct {
+	Destination string
+	Scheme      string
+	Host        string
+}
+
+func (f *httpForwarder) String() string {
+	return "httpForwarder{" + f.Destination + "}"
+}
+
+func (f *httpForwarder) shouldHandleHost(host string) bool {
+	return false
+}
+
+func (f *httpForwarder) Dial(network, addr string) (net.Conn, error) {
+	return nil, errors.New("httpForwarder does not manage traffic at this layer")
+}
+
+func (f *httpForwarder) Handle(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+	r.Host = r.URL.Host
+	if f.Host != "" {
+		r.Host = f.Host
+	}
+	r.URL.Scheme = f.Scheme
+	r.URL.Host = f.Destination
+	return r, nil
 }
 
 type socksForwarder struct {

@@ -22,9 +22,13 @@ func registerStatic(configuration *Config, proxy *goproxy.ProxyHttpServer) {
 }
 
 func makeForwarderHandler(entry ForwardEntry) (forwardinghostMatcher, error) {
-	out := &socksForwarder{Destination: entry.Destination}
 	switch entry.Type {
+	case "HTTP":
+		return &httpForwarder{Destination: entry.Destination, Scheme: "http", Host: entry.HostFieldForHTTPProxies}, nil
+	case "HTTPS":
+		return &httpForwarder{Destination: entry.Destination, Scheme: "https", Host: entry.HostFieldForHTTPProxies}, nil
 	case "SOCKS":
+		out := &socksForwarder{Destination: entry.Destination}
 		for _, rule := range entry.Rules {
 			matcher, err := makeHostBasedBlacklistHandler(rule.Type, rule.Value)
 			if err != nil {
@@ -33,8 +37,9 @@ func makeForwarderHandler(entry ForwardEntry) (forwardinghostMatcher, error) {
 				out.MatchRules = append(out.MatchRules, matcher)
 			}
 		}
+		return out, nil
 	}
-	return out, nil
+	return nil, errors.New("Could not recognise forwarder type")
 }
 
 func makeHostBasedBlacklistHandler(entryType, entryValue string) (hostMatcher, error) {
@@ -58,6 +63,14 @@ func registerURLHandlers(configuration *Config, proxy *goproxy.ProxyHttpServer) 
 			log.Println("Forwarder err: ", err)
 		} else {
 			forwardingHandlers = append(forwardingHandlers, handler)
+			if hForwarder, ok := handler.(*httpForwarder); ok {
+				for _, matcher := range entry.Rules {
+					switch matcher.Type {
+					case "prefix":
+						proxy.OnRequest(goproxy.UrlHasPrefix(matcher.Value)).DoFunc(hForwarder.Handle)
+					}
+				}
+			}
 		}
 	}
 

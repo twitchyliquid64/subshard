@@ -74,7 +74,7 @@
                     {{with $x := .Checker.GetOutput}}
                       {{if $x.Ok}}
                         <span class="badge badge-success">OK</span>
-                        <span>{{$x.Info.Version}}</span>
+                        <span>{{$x.Info.version}}</span>
                         <br />
                         {{if $x.Info.isDormant}}
                         <span class="badge badge-success">Dormant</span>
