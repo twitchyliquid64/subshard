@@ -44,8 +44,9 @@ func auth(req *http.Request, ctx *goproxy.ProxyCtx, f func(user, passwd string) 
 	ok := f(userpass[0], userpass[1])
 	if ok {
 		ctx.UserData = map[string]interface{}{
-			"auth": true,
-			"user": userpass[0],
+			"auth":     true,
+			"user":     userpass[0],
+			"authkind": "password",
 		}
 	}
 	return ok

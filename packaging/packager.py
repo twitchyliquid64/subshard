@@ -99,7 +99,7 @@ class Package(object):
 
     def _copy_data_and_bin_files(self):
         self._copy_set(self.bin_files, os.path.join(self.temp_dir, self.binary_dir), all_read_execute_bits())
-        self._copy_set(self.data_files, os.path.join(self.temp_dir, self.data_dir), all_read_bits())
+        self._copy_set(self.data_files, os.path.join(self.temp_dir, self.data_dir), all_read_execute_bits())
 
     def _log(self, message, substitutions=(), **kwargs):
         out = ''
