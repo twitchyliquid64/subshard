@@ -40,7 +40,7 @@ subshard-admin unblacklist host-expression .*facebook.com
 subshard-admin setlistener :5000 #Setup server on port 5000
 ```
 
-You can do more on the config file directly, which is located at `/etc/subshard/subshard-serv.json`. I do not recommend this however, its possible to have an insecure configuration.
+You can do more on the config file directly, which is located at `/etc/subshard/subshard-serv.json`. I do not recommend this however, its possible to have an insecure configuration. All the fields in the configuration file are documented [here](https://github.com/twitchyliquid64/subshard/blob/master/serv/config.go).
 
 ### Client
 
