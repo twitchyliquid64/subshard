@@ -142,7 +142,7 @@ func handleSubshardPage(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, 
 		return serveLandingPage(r)
 	}
 	if strings.HasPrefix(r.URL.Path, "/test") {
-		return serveTestPage(r)
+		return serveTestPage(r, ctx)
 	}
 
 	if strings.HasPrefix(r.URL.Path, "/forwarder/status/") {
@@ -154,7 +154,7 @@ func handleSubshardPage(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, 
 
 //handle a request to subshard.onion or subshard/test
 func serveOnionPage(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-	return serveTestPage(r)
+	return serveTestPage(r, ctx)
 }
 
 // handle a request to a host which is in configuration.BlasklistedHosts

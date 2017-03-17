@@ -74,7 +74,7 @@ func serveLandingPage(r *http.Request) (*http.Request, *http.Response) {
 	return r, goproxy.NewResponse(r, "text/html", 500, buff.String())
 }
 
-func serveTestPage(r *http.Request) (*http.Request, *http.Response) {
+func serveTestPage(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 	guardPagePath := "web/guard_test.html"
 	if gConfiguration.ResourcesPath != "" {
 		guardPagePath = path.Join(gConfiguration.ResourcesPath, "web/guard_test.html")
@@ -87,7 +87,7 @@ func serveTestPage(r *http.Request) (*http.Request, *http.Response) {
 		log.Println(err)
 		return r, goproxy.NewResponse(r, "text/html", 500, "Internal server error")
 	}
-	err = t.Execute(buff, map[string]interface{}{"REQ": r, "DUMP": spew.Sdump(r)})
+	err = t.Execute(buff, map[string]interface{}{"REQ": r, "DUMP": spew.Sdump(r), "USR": spew.Sdump(ctx.UserData)})
 	if err != nil {
 		log.Println(err)
 		return r, goproxy.NewResponse(r, "text/html", 500, "Internal server error")
