@@ -25,6 +25,12 @@
     .tight-element:last-child {
       display: inline-block;
     }
+    #heading {
+      margin-bottom: 8px;
+      margin-top: 7px;
+      width: 64%;
+      display: inline-block;
+    }
     </style>
     <script type="text/javascript" src="/static/jquery.min.js"></script>
   </head>
@@ -32,17 +38,22 @@
   <body>
     <div class="container">
 
-      <h1>Subshard</h1>
-
-      <div class="row">
-        <p class="lead" style="margin-top:14px; width: 60%;">
-          If you are reading this, subshard is configured correctly.
-        </p>
-        <div class="pull-xs-right">
+      <div id="heading">
+        <h1><img src="/static/subshard.png" width="55"></img> Subshard</h1>
+        <div style="position: absolute; top: 15px; right: 15px; text-align: right;">
           <a href="http://subshard.onion/" class="btn btn-outline-warning" role="button" aria-disabled="true">Test Subshard Guard</a>
           <a href="/test" class="btn btn-outline-info" role="button" aria-disabled="true">See request info</a>
         </div>
+      </div>
 
+
+      <div class="row">
+        <p class="lead" style="margin-top:14px;">
+          If you are reading this, subshard is configured correctly.
+        </p>
+      </div>
+
+      <div class="row">
         <div class="col" style="margin-top:2em;">
           <h3 >Sharding rules</h3>
           <div class="config table-responsive">
@@ -160,6 +171,10 @@
                     {{end}}
                     <p>
                       {{len .Configuration.Users}} user{{if len .Configuration.Users | ne 1}}s{{end}}
+                      {{if .CTX.UserData}}
+                          <br />user={{.CTX.UserData.user}}
+                          {{if .CTX.UserData.authkind}}<br />authkind={{.CTX.UserData.authkind}}{{end}}
+                      {{end}}
                     </p>
                   </td>
                 </tr>

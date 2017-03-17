@@ -22,6 +22,12 @@ func registerStatic(configuration *Config, proxy *goproxy.ProxyHttpServer) {
 	proxy.OnRequest(goproxy.UrlIs(serverHost + "/static/jquery.min.js")).DoFunc(func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 		return serveStatic(r, "web/jquery.min.js", "application/javascript")
 	})
+	proxy.OnRequest(goproxy.UrlIs(serverHost + "/favicon.ico")).DoFunc(func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+		return serveStatic(r, "web/subshard.png", "image/x-icon")
+	})
+	proxy.OnRequest(goproxy.UrlIs(serverHost + "/static/subshard.png")).DoFunc(func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
+		return serveStatic(r, "web/subshard.png", "image/png")
+	})
 }
 
 func makeForwarderHandler(entry ForwardEntry) (forwardinghostMatcher, error) {
@@ -139,7 +145,7 @@ func isHostBlacklisted(blacklisthostMatchers []hostMatcher, host string) (bool, 
 // handle a request to subshard/
 func handleSubshardPage(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 	if r.URL.Path == "/" {
-		return serveLandingPage(r)
+		return serveLandingPage(r, ctx)
 	}
 	if strings.HasPrefix(r.URL.Path, "/test") {
 		return serveTestPage(r, ctx)

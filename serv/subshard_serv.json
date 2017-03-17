@@ -1,5 +1,5 @@
 {
-    "auth-required": false,
+    "auth-required": true,
     "blacklist": [
         {
             "type": "host",
@@ -22,42 +22,14 @@
             "value": ".*fb.com"
         }
     ],
+    "forwarders": [
+    ],
     "listener": ":8080",
     "users": [
         {
-            "password": "01BA4719C80B6FE911B091A7C05124B64EEECE964E09C058EF8F9805DACA546B",
+            "password": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
             "username": "test"
         }
     ],
-    "verbose": true,
-    "forwarders": [
-        {
-		"name": "Yolo",
-		"type": "HTTPS",
-		"destination": "spartic:443",
-		"checker": {
-			"type": "HTTPS",
-			"destination": "https://spartic/",
-			"conn-timeout": 2000
-		},
-		"rules": [
-		{
-			"type": "prefix",
-			"value": "hanoi"
-		}
-		]
-        },
-        {
-		"name": "Yolo2",
-		"type": "HTTP",
-		"destination": "dicapt1:80",
-		"host": "dicapt",
-		"rules": [
-		{
-			"type": "prefix",
-			"value": "dicapt.local"
-		}
-		]
-        }
-    ]
+    "verbose": true
 }

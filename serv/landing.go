@@ -29,9 +29,10 @@ type landingPageInfo struct {
 	TLSInfo       map[string]string
 	ReloadCount   int
 	Blacklist     []BlacklistEntry
+	CTX           *goproxy.ProxyCtx
 }
 
-func makeLandingPageInfo() *landingPageInfo {
+func makeLandingPageInfo(ctx *goproxy.ProxyCtx) *landingPageInfo {
 	servers := ""
 	if gTLSConfig != nil {
 		count := 0
@@ -49,10 +50,11 @@ func makeLandingPageInfo() *landingPageInfo {
 		TLSInfo:       map[string]string{"Servers": servers},
 		ReloadCount:   gConfigReloads,
 		Blacklist:     gValidBlacklistEntries,
+		CTX:           ctx,
 	}
 }
 
-func serveLandingPage(r *http.Request) (*http.Request, *http.Response) {
+func serveLandingPage(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 	landingPagePath := "web/landing.html"
 	if gConfiguration.ResourcesPath != "" {
 		landingPagePath = path.Join(gConfiguration.ResourcesPath, "web/landing.html")
@@ -65,7 +67,7 @@ func serveLandingPage(r *http.Request) (*http.Request, *http.Response) {
 		log.Println(err)
 		return r, goproxy.NewResponse(r, "text/html", 500, "Internal server error")
 	}
-	err = t.Execute(buff, makeLandingPageInfo())
+	err = t.Execute(buff, makeLandingPageInfo(ctx))
 	if err != nil {
 		log.Println(err)
 		return r, goproxy.NewResponse(r, "text/html", 500, "Internal server error")
