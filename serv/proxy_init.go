@@ -27,6 +27,7 @@ func registerStatic(configuration *Config, proxy *goproxy.ProxyHttpServer) {
 	})
 }
 
+//makes a handler object for a forwarder entry.
 func makeForwarderHandler(entry ForwardEntry) (forwardinghostMatcher, error) {
 	switch entry.Type {
 	case "HTTP":
@@ -38,7 +39,7 @@ func makeForwarderHandler(entry ForwardEntry) (forwardinghostMatcher, error) {
 		for _, rule := range entry.Rules {
 			matcher, err := makeHostBasedBlacklistHandler(rule.Type, rule.Value)
 			if err != nil {
-				log.Printf("Ommitting invalid forwarder rule (%s): %s\n", rule.Value, err)
+				log.Printf("Omitting invalid forwarder rule (%s): %s\n", rule.Value, err)
 			} else {
 				out.MatchRules = append(out.MatchRules, matcher)
 			}
