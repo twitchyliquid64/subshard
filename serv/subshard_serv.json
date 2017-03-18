@@ -1,5 +1,11 @@
 {
     "auth-required": true,
+	"TLS": {
+		"enabled": true,
+		"cert-pem-path": "/etc/subshard/cert.pem",
+		"key-pem-path": "/etc/subshard/key.pem",
+		"want-client-certs": true
+	},
     "blacklist": [
         {
             "type": "host",

@@ -19,9 +19,10 @@ type Config struct {
 	Version       string           `json:"version"`            //Version to show on the landing page to users.
 
 	TLS struct {
-		CertPemPath string `json:"cert-pem-path"`
-		KeyPemPath  string `json:"key-pem-path"`
-		Enabled     bool   `json:"enabled"`
+		CertPemPath     string `json:"cert-pem-path"`
+		KeyPemPath      string `json:"key-pem-path"`
+		Enabled         bool   `json:"enabled"`
+		WantClientCerts bool   `json:"want-client-certs"` //If true, the server will request a client certificate.
 	}
 
 	Path string `json:"-"`
@@ -29,9 +30,8 @@ type Config struct {
 
 // User represents the structure of a user in the configuration file.
 type User struct {
-	Username             string `json:"username"`
-	Password             string `json:"password"` //SHA256 hash of password
-	DisallowPasswordAuth bool   //NOT IMPLEMENTED: Stop password logins if set. Intended to be used in conjunction with a client certificate.
+	Username string `json:"username"`
+	Password string `json:"password"` //SHA256 hash of password
 }
 
 // BlacklistEntry represents the structure of a blacklisted host/regexp

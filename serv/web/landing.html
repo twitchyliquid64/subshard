@@ -165,12 +165,13 @@
                   <td>Auth</td>
                   <td>
                     {{if .Configuration.AuthRequired}}
-                    <span class="badge badge-success">Passwords required</span>
+                    <span class="badge badge-success">Authentication required</span>
                     {{else}}
-                    <span class="badge badge-warning">Passwords disabled</span>
+                    <span class="badge badge-warning">Authentication disabled</span>
                     {{end}}
                     <p>
-                      {{len .Configuration.Users}} user{{if len .Configuration.Users | ne 1}}s{{end}}
+                      {{len .Configuration.Users}} user{{if len .Configuration.Users | ne 1}}s{{end}} in system
+                      <br />
                       {{if .CTX.UserData}}
                           <br />user={{.CTX.UserData.user}}
                           {{if .CTX.UserData.authkind}}<br />authkind={{.CTX.UserData.authkind}}{{end}}

@@ -1,9 +1,7 @@
 package main
 
 import (
-	"crypto/sha256"
 	"errors"
-	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -11,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/elazarl/goproxy"
-	"github.com/elazarl/goproxy/ext/auth"
 )
 
 // register URL handlers to handle static files.
@@ -174,16 +171,7 @@ func makeProxyServer(configuration *Config) (*goproxy.ProxyHttpServer, error) {
 
 	// setup auth
 	if configuration.AuthRequired {
-		auth.ProxyBasic(proxy, "subshard", func(user, passwd string) bool {
-			sha1Hash := fmt.Sprintf("%x", sha256.Sum256([]byte(passwd)))
-
-			for _, usr := range configuration.Users {
-				if usr.Username == user && usr.Password == sha1Hash {
-					return true
-				}
-			}
-			return false
-		})
+		SetupProxyAuthentication(proxy, "subshard", configuration.Users)
 	}
 
 	// setup blacklists + forwarders

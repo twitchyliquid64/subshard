@@ -12,6 +12,9 @@ func tlsConfig(configuration *Config) (*tls.Config, error) {
 	tlsConfig.MinVersion = tls.VersionTLS12
 	tlsConfig.CurvePreferences = []tls.CurveID{tls.CurveP384, tls.CurveP256}
 	tlsConfig.PreferServerCipherSuites = true
+	if configuration.TLS.WantClientCerts {
+		tlsConfig.ClientAuth = tls.RequestClientCert
+	}
 	tlsConfig.CipherSuites = []uint16{
 		tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,
 		tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,

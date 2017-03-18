@@ -1,8 +1,10 @@
-package auth
+package main
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"encoding/base64"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -10,10 +12,11 @@ import (
 	"github.com/elazarl/goproxy"
 )
 
+//Code mostly from github.com/elazar/goproxy - all credit his.
+
 var unauthorizedMsg = []byte("407 Proxy Authentication Required")
 
-func BasicUnauthorized(req *http.Request, realm string) *http.Response {
-	// TODO(elazar): verify realm is well formed
+func basicUnauthorizedResponse(req *http.Request, realm string) *http.Response {
 	return &http.Response{
 		StatusCode:    407,
 		ProtoMajor:    1,
@@ -27,7 +30,8 @@ func BasicUnauthorized(req *http.Request, realm string) *http.Response {
 
 var proxyAuthorizationHeader = "Proxy-Authorization"
 
-func auth(req *http.Request, ctx *goproxy.ProxyCtx, f func(user, passwd string) bool) bool {
+//Checks for password
+func checkRequestAuthentication(req *http.Request, ctx *goproxy.ProxyCtx, f func(ctx *goproxy.ProxyCtx, user, passwd string) (bool, map[string]interface{})) bool {
 	authheader := strings.SplitN(req.Header.Get(proxyAuthorizationHeader), " ", 2)
 	req.Header.Del(proxyAuthorizationHeader)
 	if len(authheader) != 2 || authheader[0] != "Basic" {
@@ -41,12 +45,13 @@ func auth(req *http.Request, ctx *goproxy.ProxyCtx, f func(user, passwd string) 
 	if len(userpass) != 2 {
 		return false
 	}
-	ok := f(userpass[0], userpass[1])
+	ok, mapData := f(ctx, userpass[0], userpass[1])
 	if ok {
 		ctx.UserData = map[string]interface{}{
 			"auth":     true,
 			"user":     userpass[0],
 			"authkind": "password",
+			"info":     mapData,
 		}
 	}
 	return ok
@@ -55,10 +60,10 @@ func auth(req *http.Request, ctx *goproxy.ProxyCtx, f func(user, passwd string) 
 // Basic returns a basic HTTP authentication handler for requests
 //
 // You probably want to use auth.ProxyBasic(proxy) to enable authentication for all proxy activities
-func Basic(realm string, f func(user, passwd string) bool) goproxy.ReqHandler {
+func Basic(realm string, f func(ctx *goproxy.ProxyCtx, user, passwd string) (bool, map[string]interface{})) goproxy.ReqHandler {
 	return goproxy.FuncReqHandler(func(req *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-		if !auth(req, ctx, f) {
-			return nil, BasicUnauthorized(req, realm)
+		if !checkRequestAuthentication(req, ctx, f) {
+			return nil, basicUnauthorizedResponse(req, realm)
 		}
 		return req, nil
 	})
@@ -67,18 +72,28 @@ func Basic(realm string, f func(user, passwd string) bool) goproxy.ReqHandler {
 // BasicConnect returns a basic HTTP authentication handler for CONNECT requests
 //
 // You probably want to use auth.ProxyBasic(proxy) to enable authentication for all proxy activities
-func BasicConnect(realm string, f func(user, passwd string) bool) goproxy.HttpsHandler {
+func BasicConnect(realm string, f func(ctx *goproxy.ProxyCtx, user, passwd string) (bool, map[string]interface{})) goproxy.HttpsHandler {
 	return goproxy.FuncHttpsHandler(func(host string, ctx *goproxy.ProxyCtx) (*goproxy.ConnectAction, string) {
-		if !auth(ctx.Req, ctx, f) {
-			ctx.Resp = BasicUnauthorized(ctx.Req, realm)
+		if !checkRequestAuthentication(ctx.Req, ctx, f) {
+			ctx.Resp = basicUnauthorizedResponse(ctx.Req, realm)
 			return goproxy.RejectConnect, host
 		}
 		return goproxy.OkConnect, host
 	})
 }
 
-// ProxyBasic will force HTTP authentication before any request to the proxy is processed
-func ProxyBasic(proxy *goproxy.ProxyHttpServer, realm string, f func(user, passwd string) bool) {
+// SetupProxyAuthentication will force HTTP authentication or valid TLS client certs before any request to the proxy is processed.
+func SetupProxyAuthentication(proxy *goproxy.ProxyHttpServer, realm string, users []User) {
+	f := func(ctx *goproxy.ProxyCtx, user, passwd string) (bool, map[string]interface{}) {
+		sha1Hash := fmt.Sprintf("%x", sha256.Sum256([]byte(passwd)))
+		for _, usr := range users {
+			if usr.Username == user && usr.Password == sha1Hash {
+				return true, map[string]interface{}{}
+			}
+		}
+		return false, nil
+	}
+
 	proxy.OnRequest().Do(Basic(realm, f))
 	proxy.OnRequest().HandleConnect(BasicConnect(realm, f))
 }
