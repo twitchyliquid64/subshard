@@ -7,7 +7,7 @@ _Requires Ubuntu. Can be trivally made to work on other UNIX platforms but you w
 the packaging script, or downloading a prebuilt package from the github.
 3. Follow the prompts to setup a default configuration. Specifically, create a username and password for first use, and put in the DNS address from step 1.
 4. Copy `/etc/subshard/cert.pem` to your machine. Each client will need a copy of this file.
-5. Everything should now be setup! You can now run ~~`sudo service subshard-serv start` to bring it up, and `sudo service subshard-serv stop` to bring it down.~~ Manually run `subshard-serv` inside a screen session or in the background.
+5. Everything should now be setup! You can now run ~~`sudo service subshard-serv start` to bring it up, and `sudo service subshard-serv stop` to bring it down.~~ Manually run `subshard-serv` inside a screen session or in the background. I need to fix the sysv wrapper.
 
 ## Server administration
 
