@@ -165,6 +165,14 @@ def show(data, args):
         sys.exit(1)
 
 
+def forward(data, args):
+    entries = data.get('forwarders', [])
+    if len(args) > 2:
+        exists = any([x['name'] == args[1] for x in entries])
+        print exists
+
+
+
 if __name__ == '__main__':
     args = parseArgs()
     checkArgs(args)
@@ -190,6 +198,8 @@ if __name__ == '__main__':
         unblacklist(data, args)
     if command == 'show':
         show(data, args)
+    if command == 'forward':
+        forward(data, args)
 
 
     try:

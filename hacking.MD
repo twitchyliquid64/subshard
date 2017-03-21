@@ -21,6 +21,6 @@ Importantly, we:
 
 ## Building
 
-Building the server is easy, you cd into serv/ set the gopath ``export GOPATH=`pwd` `` and `go build`. `serv` should now exist. To make the deb for the server, you cd into `package/server_deb` and invoke `make_deb.py <version> <architecture>`
+Building the server is easy, you cd into `serv/`, set the gopath ``export GOPATH=`pwd` ``, and `go build`. `serv` should now exist. To make the deb for the server, you cd into `package/server_deb` and invoke `make_deb.py <version> <architecture>`.
 
 Building the client packages is more complex, you cd into `packaging/{deb,dmg}` and run the corresponding make python script. This was built to be run in a debian environment (especially make_dmg.py), so you may be missing some commands. See the python script for details.

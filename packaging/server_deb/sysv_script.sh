@@ -4,6 +4,7 @@
 #
 
 # Start the service subshard-serv
+# DOESNT WORK! NEED TO FIX
 start() {
         /usr/bin/subshard-serv &
         echo
