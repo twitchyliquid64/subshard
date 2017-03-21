@@ -172,7 +172,7 @@ func makeProxyServer(configuration *Config) (*goproxy.ProxyHttpServer, error) {
 
 	// setup auth
 	if configuration.AuthRequired {
-		SetupProxyAuthentication(proxy, "subshard", configuration.Users)
+		SetupProxyAuthentication(proxy, "proxy", configuration.Users)
 	}
 
 	// setup blacklists + forwarders
