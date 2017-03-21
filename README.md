@@ -17,6 +17,7 @@ _The Tor browser is an easy target for browser exploits. Such approaches are kno
  * Firefox lacks a lot of generic exploit protections that other browsers implement.
  * The Tor browser cuts its updates from Extended Support Release, often getting important security fixes _months_ after it is patched. Chrome, by contrast prioritises these releases and has them out typically in 2 weeks. They also do some patching to mitigate this, but I can't say I have the highest of confidence in this approach.
  * There are comparitively few versions of the browser bundle, meaning exploit writers have an easier job targeting exploits for Tor users. Ideally, a large number of browsers with diverse code bases are used, making targeted exploits harder.
+ * All Tor traffic is generated on the server, meaning your local network cannot easily detect Tor is in use. Rather, they see a HTTPS proxy connection. This also simplifies client configuration.
  * Subshard is an attempt to bring the best of Chromes security into the Tor ecosystem.
 
 ## Other features
@@ -24,9 +25,14 @@ _The Tor browser is an easy target for browser exploits. Such approaches are kno
  * Entirely separate chrome instance - no sharing of cookies / history / local storage / extensions.
  * Bright red color theme means it is always obvious which chrome you are in.
  * Serverside domain blacklists can help to prevent accidental browsing to certain sites, or prevent traffic hitting certain domains (eg: ad domains).
- * Automatically forward traffic to specific domains to another SOCKS/HTTP/HTTPS proxy. These rules are defined by regexes on the server.
+ * Automatically forward traffic on specific domains to another SOCKS/HTTP/HTTPS proxy. These rules are defined by regexes on the server (see: Forwarders).
  * Multiple user support
  * We have an extension - `subshard guard` - that hacks in basic first-party isolation for Tor domains. This is the one feature of Firefox that I miss.
+
+## Downsides
+
+ * Less tried-and-tested than the Tor browser.
+ * Tor traffic is generated on the server, so we must trust the Server.
 
 ## Installation
 
@@ -60,5 +66,5 @@ For issues in your Client: [Client Troubleshooting](https://github.com/twitchyli
  - [ ] Code cleanup around proxy initialization and Authentication.
  - [ ] Support for Client certificate authentication.
  - [ ] Automated testing for important security features, rather than me manually testing each release.
- - [ ] Salt the password in the db.
+ - [ ] Salt the password in configuration.
  - [ ] More security features!

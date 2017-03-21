@@ -39,7 +39,7 @@ subshard-admin setlistener :5000 #Set server listener on port 5000 instead
 
 #Setup a forwarder, forwarding all URLs to a SOCKS proxy on localhost:9050.
 subshard-admin forward ".*" MyOtherProxy localhost:9050 SOCKS
- #Routes all URLs matching the pattern .*.internal, to MyProxy. Assumes MyProxy forwarder already exists.
+ #Routes all URLs matching the pattern .*.internal, to MyOtherProxy. Assumes MyOtherProxy forwarder already exists.
 subshard-admin forward ".*.internal" MyOtherProxy
 #Remotes the routing rule matching '.*' to the MyOtherProxy forwarder.
 subshard-admin unforward ".*" MyOtherProxy
