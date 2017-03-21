@@ -46,6 +46,8 @@ def help():
     print '\tsetauthrequired <true/false> - Sets whether a user/password login is needed to use subshard.'
     print '\tblacklist <rule type> <rule> - Creates a blacklist rule.'
     print '\tunblacklist <rule type> <rule> - Deletes a blacklist rule.'
+    print '\tforward <regex-rule> <Forwarder name> <forwarder destination> <forwarder type> - Creates a rule which forwards traffic to the given forwarder. If the forwarder already exists, destination and type are ignored and can be omitted.'
+    print '\tunforward <regex-rule> <Forwarder name> - Delete a routing rule that forwards traffic matching the regex to the forwarders destination.'
     print '\tshow config - Prints the configuration of the server.'
 
 
@@ -66,7 +68,7 @@ def parseArgs():
 
 
 _ALLOWED_COMMANDS = ('adduser', 'deluser', 'clean', 'setpw', 'setverbosity', 'set-verbosity', 'setlistener', 'set-listener',
-                     'setauthrequired', 'set-auth-required', 'blacklist', 'unblacklist', 'show')
+                     'setauthrequired', 'set-auth-required', 'blacklist', 'unblacklist', 'show', 'forward', 'unforward')
 
 def checkArgs(args):
     if len(args) < 2:
@@ -165,11 +167,63 @@ def show(data, args):
         sys.exit(1)
 
 
-def forward(data, args):
+def unforward(data, args):
+    if len(args) < 2:
+        print 'Err: Need parameters: <rule> <forwarder name>'
+        sys.exit(1)
+
     entries = data.get('forwarders', [])
-    if len(args) > 2:
-        exists = any([x['name'] == args[1] for x in entries])
-        print exists
+    forwarder_exists = any([x['name'] == args[1] for x in entries])
+    if not forwarder_exists:
+        print 'Err: Could not find a forwarder by the name \'%s\'' % args[1]
+        sys.exit(1)
+    index = [i for i in range(len(entries)) if entries[i]['name'] == args[1]][0]
+
+    new_rules = [x for x in entries[index].get('rules', []) if x['value'] != args[0]]
+    if len(new_rules) == len(entries[index].get('rules', [])):
+        print 'Err: No rule %s' % args[0]
+        sys.exit(1)
+    entries[index]['rules'] = new_rules
+    data['forwarders'] = entries
+
+
+def forward(data, args):
+    if len(args) >= 1:
+        try:
+            re.compile(args[0])
+        except re.error, e:
+            print 'Err: Invalid regular expression %s: %s' % (args[0], e)
+            sys.exit(1)
+
+    entries = data.get('forwarders', [])
+    if len(args) > 1: #we have at least rule + forwarder name
+        forwarder_exists = any([x['name'] == args[1] for x in entries])
+        if forwarder_exists: #adding a new rule
+            index = [i for i in range(len(entries)) if entries[i]['name'] == args[1]][0]
+            if not any([x['value'] == args[0] for x in entries[index].get('rules', [])]): #if the rule doesnt exist
+                entries[index]['rules'] = entries[index].get('rules', []) + [{'type': 'host-regexp', 'value': args[0]}]
+                if len(args) > 2:
+                    print "Adding rule '" + args[0] + "', but ignoring forwarder type and destination because the forwarder already exists."
+            else:
+                print 'Err: rule already exists'
+                sys.exit(1)
+        else:
+            if len(args) < 4:
+                print 'Err: Missing parameters. Expecting <rule> <forwarder name> <forwarder address> <forwarder type>'
+                sys.exit(1)
+            if args[3] not in ('SOCKS', 'HTTP', 'HTTPS'):
+                print 'Err: Invalid forwarder type.'
+                sys.exit(1)
+            entries.append({
+                'type': args[3],
+                'name': args[1],
+                'destination': args[2],
+                'rules': [{
+                    'type': 'host-regexp' if args[3] == 'SOCKS' else 'prefix',
+                    'value': args[0],
+                }],
+            })
+        data['forwarders'] = entries
 
 
 
@@ -200,6 +254,8 @@ if __name__ == '__main__':
         show(data, args)
     if command == 'forward':
         forward(data, args)
+    if command == 'unforward':
+        unforward(data, args)
 
 
     try:

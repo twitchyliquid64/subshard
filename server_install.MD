@@ -15,8 +15,11 @@ The steps above will get you a Proxy. To funnel everything in Tor, do the follow
 
 1. Install Tor: `sudo apt-get install tor`
 2. Launch Tor if it hasnt already: `sudo service start tor`
-3. Now, we tell subshard to forward traffic matching a specific regex to Tor. Run `subshard-admin forward .* Tor localhost:9050 SOCKS`
+3. Now, we tell subshard to forward traffic matching a specific regex to Tor. Run `subshard-admin forward ".*" Tor localhost:9050 SOCKS`. Dont forget quotes around the regex!
  * This tells Subshard to add a new forwarding rule called 'Tor', matching all hosts that match `.*`, forwarding them to a SOCKS proxy at `localhost:9050`. This is the default listening address of tor.
+ * If you wanted, you can instead only route `.onion` addresses through Tor and simply proxy the rest of the internet. This is not secure, so make an evaluation based on what you are doing.
+
+TODO: Describe how to setup the health checker feature.
 
 ## Server administration
 
@@ -32,7 +35,14 @@ subshard-admin deluser user2
 subshard-admin setpw user2
 subshard-admin blacklist host-expression .*facebook.com
 subshard-admin unblacklist host-expression .*facebook.com
-subshard-admin setlistener :5000 #Setup server on port 5000
+subshard-admin setlistener :5000 #Set server listener on port 5000 instead
+
+#Setup a forwarder, forwarding all URLs to a SOCKS proxy on localhost:9050.
+subshard-admin forward ".*" MyOtherProxy localhost:9050 SOCKS
+ #Routes all URLs matching the pattern .*.internal, to MyProxy. Assumes MyProxy forwarder already exists.
+subshard-admin forward ".*.internal" MyOtherProxy
+#Remotes the routing rule matching '.*' to the MyOtherProxy forwarder.
+subshard-admin unforward ".*" MyOtherProxy
 ```
 
 You can do more on the config file directly, which is located at `/etc/subshard/subshard-serv.json`. I do not recommend this however, its possible to have an insecure configuration. All the fields in the configuration file are documented [here](https://github.com/twitchyliquid64/subshard/blob/master/serv/config.go).

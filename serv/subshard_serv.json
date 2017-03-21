@@ -1,11 +1,11 @@
 {
+    "TLS": {
+        "cert-pem-path": "/etc/subshard/cert.pem",
+        "enabled": true,
+        "key-pem-path": "/etc/subshard/key.pem",
+        "want-client-certs": true
+    },
     "auth-required": true,
-	"TLS": {
-		"enabled": true,
-		"cert-pem-path": "/etc/subshard/cert.pem",
-		"key-pem-path": "/etc/subshard/key.pem",
-		"want-client-certs": true
-	},
     "blacklist": [
         {
             "type": "host",
@@ -27,8 +27,6 @@
             "type": "host-regexp",
             "value": ".*fb.com"
         }
-    ],
-    "forwarders": [
     ],
     "listener": ":8080",
     "users": [
