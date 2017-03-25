@@ -530,7 +530,7 @@ type VerifyNoProxyHeaders struct {
 }
 
 func (v VerifyNoProxyHeaders) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Header.Get("Connection") != "" || r.Header.Get("Proxy-Connection") != "" ||
+	if r.Header.Get("Proxy-Connection") != "" ||
 		r.Header.Get("Proxy-Authenticate") != "" || r.Header.Get("Proxy-Authorization") != "" {
 		v.Error("Got Connection header from goproxy", r.Header)
 	}
@@ -542,7 +542,6 @@ func TestNoProxyHeaders(t *testing.T) {
 	defer l.Close()
 	req, err := http.NewRequest("GET", s.URL, nil)
 	panicOnErr(err, "bad request")
-	req.Header.Add("Connection", "close")
 	req.Header.Add("Proxy-Connection", "close")
 	req.Header.Add("Proxy-Authenticate", "auth")
 	req.Header.Add("Proxy-Authorization", "auth")
@@ -666,13 +665,13 @@ func TestGoproxyHijackConnect(t *testing.T) {
 	proxy := goproxy.NewProxyHttpServer()
 	proxy.OnRequest(goproxy.ReqHostIs(srv.Listener.Addr().String())).
 		HijackConnect(func(req *http.Request, client net.Conn, ctx *goproxy.ProxyCtx) {
-		t.Logf("URL %+#v\nSTR %s", req.URL, req.URL.String())
-		resp, err := http.Get("http:" + req.URL.String() + "/bobo")
-		panicOnErr(err, "http.Get(CONNECT url)")
-		panicOnErr(resp.Write(client), "resp.Write(client)")
-		resp.Body.Close()
-		client.Close()
-	})
+			t.Logf("URL %+#v\nSTR %s", req.URL, req.URL.String())
+			resp, err := http.Get("http:" + req.URL.String() + "/bobo")
+			panicOnErr(err, "http.Get(CONNECT url)")
+			panicOnErr(resp.Write(client), "resp.Write(client)")
+			resp.Body.Close()
+			client.Close()
+		})
 	client, l := oneShotProxy(proxy, t)
 	defer l.Close()
 	proxyAddr := l.Listener.Addr().String()
