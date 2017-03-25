@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -19,12 +18,18 @@ type hostMatcher interface {
 type forwardinghostMatcher interface {
 	hostMatcher
 	Dial(network, addr string) (net.Conn, error)
+	AppendMatchRule(hostMatcher)
 }
 
 type httpForwarder struct {
+	MatchRules  []hostMatcher
 	Destination string
 	Scheme      string
 	Host        string
+}
+
+func (f *httpForwarder) AppendMatchRule(m hostMatcher) {
+	f.MatchRules = append(f.MatchRules, m)
 }
 
 func (f *httpForwarder) String() string {
@@ -32,11 +37,16 @@ func (f *httpForwarder) String() string {
 }
 
 func (f *httpForwarder) shouldHandleHost(host string) bool {
+	for _, rule := range f.MatchRules {
+		if rule.shouldHandleHost(host) {
+			return true
+		}
+	}
 	return false
 }
 
 func (f *httpForwarder) Dial(network, addr string) (net.Conn, error) {
-	return nil, errors.New("httpForwarder does not manage traffic at this layer")
+	return net.Dial("tcp", f.Destination)
 }
 
 func (f *httpForwarder) Handle(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
@@ -61,6 +71,10 @@ func (f *socksForwarder) shouldHandleHost(host string) bool {
 		}
 	}
 	return false
+}
+
+func (f *socksForwarder) AppendMatchRule(m hostMatcher) {
+	f.MatchRules = append(f.MatchRules, m)
 }
 
 func (f *socksForwarder) Dial(network, addr string) (net.Conn, error) {

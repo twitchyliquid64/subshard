@@ -28,29 +28,32 @@ func registerStatic(configuration *Config, proxy *goproxy.ProxyHttpServer) {
 }
 
 //makes a handler object for a forwarder entry.
-func makeForwarderHandler(entry ForwardEntry) (forwardinghostMatcher, error) {
+func makeForwarderHandler(entry ForwardEntry) (out forwardinghostMatcher, err error) {
 	switch entry.Type {
 	case "HTTP":
-		return &httpForwarder{Destination: entry.Destination, Scheme: "http", Host: entry.HostFieldForHTTPProxies}, nil
+		out = &httpForwarder{Destination: entry.Destination, Scheme: "http", Host: entry.HostFieldForHTTPProxies}
 	case "HTTPS":
-		return &httpForwarder{Destination: entry.Destination, Scheme: "https", Host: entry.HostFieldForHTTPProxies}, nil
+		out = &httpForwarder{Destination: entry.Destination, Scheme: "https", Host: entry.HostFieldForHTTPProxies}
 	case "SOCKS":
-		out := &socksForwarder{Destination: entry.Destination}
-		for _, rule := range entry.Rules {
-			matcher, err := makeHostBasedBlacklistHandler(rule.Type, rule.Value)
-			if err != nil {
-				log.Printf("Omitting invalid forwarder rule (%s): %s\n", rule.Value, err)
-			} else {
-				out.MatchRules = append(out.MatchRules, matcher)
-			}
-		}
-		return out, nil
+		out = &socksForwarder{Destination: entry.Destination}
+	default:
+		return nil, errors.New("Could not recognise forwarder type")
 	}
-	return nil, errors.New("Could not recognise forwarder type")
+	for _, rule := range entry.Rules {
+		matcher, err := makeHostBasedBlacklistHandler(rule.Type, rule.Value)
+		if err != nil {
+			log.Printf("Omitting invalid forwarder rule (%s): %s\n", rule.Value, err)
+		} else {
+			out.AppendMatchRule(matcher)
+		}
+	}
+	return out, nil
 }
 
 func makeHostBasedBlacklistHandler(entryType, entryValue string) (hostMatcher, error) {
 	switch entryType {
+	case "prefix":
+		fallthrough
 	case "host":
 		return &blacklistedhostMatcher{Host: entryValue}, nil
 	case "host-regexp":
