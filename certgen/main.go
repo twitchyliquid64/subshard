@@ -11,7 +11,6 @@ import (
 	"math/big"
 	unsecure_rand "math/rand"
 	"os"
-	"os/exec"
 	"time"
 )
 
@@ -225,19 +224,19 @@ func main() {
 		fmt.Println("Error!\n: ", err)
 		os.Exit(1)
 	}
-	err = WritePrivateCertToFile("", "/etc/subshard/cert.server.pem", "/etc/subshard/key.pem", "", fullSubjectCert)
+	err = WritePrivateCertToFile("", "/etc/subshard/cert.pem", "/etc/subshard/key.pem", "", fullSubjectCert)
 	if err != nil {
 		fmt.Println("Error!\n: ", err)
 		os.Exit(1)
 	}
 	fmt.Println("DONE.")
-	fmt.Println("Written to /etc/subshard/cert.server.pem & /etc/subshard/key.pem")
+	fmt.Println("Written to /etc/subshard/cert.pem & /etc/subshard/key.pem")
 
-	out, err := exec.Command("sh", "-c", "cat /etc/subshard/cert.server.pem /etc/subshard/ca.pem > /etc/subshard/cert.pem").Output()
-	fmt.Println(string(out))
-	if err != nil {
-		fmt.Println("Error!\n: ", err)
-		os.Exit(1)
-	}
-	fmt.Println("Written combined certificate to /etc/subshard/cert.pem")
+	// out, err := exec.Command("sh", "-c", "cat /etc/subshard/cert.server.pem /etc/subshard/ca.pem > /etc/subshard/cert.pem").Output()
+	// fmt.Println(string(out))
+	// if err != nil {
+	// 	fmt.Println("Error!\n: ", err)
+	// 	os.Exit(1)
+	// }
+	// fmt.Println("Written combined certificate to /etc/subshard/cert.pem")
 }
