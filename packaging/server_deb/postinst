@@ -12,16 +12,15 @@ echo ""
 
 if [ -f /etc/subshard/key.pem ]; then
    echo "${Yellow}Subshard SSL key already exists, the installer will not generate default ones.${Color_Off}"
-   echo "${Yellow}To regenerate your keys, run ${Color_Off}openssl req -x509 -nodes -newkey rsa:4096 -sha256 -keyout /etc/subshard/key.pem -out /etc/subshard/cert.pem -days 365 ${Yellow}in your terminal.${Color_Off}"
+   echo "${Yellow}To regenerate your keys, run ${Color_Off}subshard-gen-keys ${Yellow}in your terminal.${Color_Off}"
 else
   echo "${Yellow}Generating self-signed certificate. Please enter correct values, for any prompts.${Color_Off}"
-  echo "${Yellow}It is safe to leave all prompts at the default, except for the ${Color_Off}Common Name${Yellow} prompt, for which you should give the DNS address of this server.${Color_Off}"
-  openssl req -x509 -nodes -newkey rsa:4096 -sha256 -keyout /etc/subshard/key.pem -out /etc/subshard/cert.pem -days 365
+  subshard-gen-keys
 
   echo ""
   echo "${Yellow} ~====  IMPORTANT  ====~${Color_Off}"
-  echo "Subshard server is installed, however you need to install the auto-generated SSL certifcate on each of your machines."
-  echo "You can find it at ${Cyan}/etc/subshard/cert.pem${Color_Off}."
+  echo "Subshard server is installed, however you need to install the auto-generated SSL CA on each of your machines."
+  echo "You can find it at ${Cyan}/etc/subshard/ca.pem${Color_Off}."
   echo ""
   echo "On your linux clients, install the certificate by running: subshard-install-cert <path-to-certificate>"
 fi

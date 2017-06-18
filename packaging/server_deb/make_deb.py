@@ -17,7 +17,8 @@ if __name__ == '__main__':
                                       maintainer='Twitchyliquid64 <twitchyliquid64@ciphersink.net>',
                                       description='Subshard serv is the serverside equivalent to subshard.',
                                       bin_files={'../../serv/serv': 'subshard-serv',
-                                                 'admin.py': 'subshard-admin'},
+                                                 'admin.py': 'subshard-admin',
+                                                 '../../certgen/certgen': 'subshard-gen-keys'},
                                       data_files={'../../serv/web': 'web'},
                                       #binary_dir='bin', -- usr/bin is good
                                       configuration_dir='etc/subshard',
