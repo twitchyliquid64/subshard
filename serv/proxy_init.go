@@ -169,9 +169,21 @@ func handleBlacklistedHost(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Reques
 	return r, goproxy.NewResponse(r, "text/html", 403, "Forbidden")
 }
 
+type normalRequestHandler struct{ c *Config }
+
+func (n *normalRequestHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/ca-cert" {
+		http.ServeFile(w, r, "/etc/subshard/ca.pem")
+	}
+	if r.URL.Path == "/full-cert" {
+		http.ServeFile(w, r, "/etc/subshard/cert.pem")
+	}
+}
+
 func makeProxyServer(configuration *Config) (*goproxy.ProxyHttpServer, error) {
 	proxy := goproxy.NewProxyHttpServer()
 	proxy.Verbose = configuration.Verbose
+	proxy.NonproxyHandler = &normalRequestHandler{configuration}
 
 	// setup auth
 	if configuration.AuthRequired {
