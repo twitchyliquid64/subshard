@@ -1,5 +1,7 @@
 # Subshard <img src="https://github.com/twitchyliquid64/subshard/raw/master/packaging/deb/chromeball_google_chrome_poke_by_azerik92-d4c31vz.png" width="48">
 
+**This project is abandoned and (due to changes to Chrome Certificate Validation) non-functional. It exists for historical purposes only.**
+
 Subshard is an attempt to make a better 'Tor browser' - based on Chrome instead of Firefox, and using a client-server model instead of a 'thick client'.
 
 ## How it works
